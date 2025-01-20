@@ -4,8 +4,8 @@ import (
 	"flag"
 	"log"
 
-	"github.com/shashwatrathod/redis-internals/main/config"
-	"github.com/shashwatrathod/redis-internals/main/server"
+	"github.com/shashwatrathod/redis-internals/config"
+	"github.com/shashwatrathod/redis-internals/server"
 )
 
 // setupFlags initializes the command-line flags for the application.

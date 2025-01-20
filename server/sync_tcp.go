@@ -6,7 +6,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/shashwatrathod/redis-internals/main/config"
+	"github.com/shashwatrathod/redis-internals/config"
 )
 
 var concurrent_clients = 0
@@ -27,7 +27,6 @@ func RunMultiThreadedSyncTcpServer() {
 
 	log.Println("TCP Server listening for connections at ", address)
 
-
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -35,7 +34,7 @@ func RunMultiThreadedSyncTcpServer() {
 			conn.Close()
 			panic(err)
 		}
-		
+
 		concurrent_clients += 1
 		log.Println("Client connected with address:", conn.RemoteAddr(), "; concurrent clients = ", concurrent_clients)
 
@@ -43,16 +42,15 @@ func RunMultiThreadedSyncTcpServer() {
 	}
 }
 
-
 func handleConnection(conn net.Conn) {
 	for {
 		cmd, err := readCommand(conn)
-		
-		if (err != nil) {
+
+		if err != nil {
 			conn.Close()
 			concurrent_clients -= 1
-			log.Println("Client ",conn.RemoteAddr(), " disconnected. Concurrent clients = ", concurrent_clients)
-			if (err == io.EOF) {
+			log.Println("Client ", conn.RemoteAddr(), " disconnected. Concurrent clients = ", concurrent_clients)
+			if err == io.EOF {
 				break
 			}
 			log.Println("Error", err)
@@ -60,7 +58,7 @@ func handleConnection(conn net.Conn) {
 
 		log.Println("Command : ", cmd)
 		err = echo(cmd, conn)
-		if (err != nil) {
+		if err != nil {
 			log.Println("Error while sending response: ", err)
 		}
 	}
@@ -68,7 +66,7 @@ func handleConnection(conn net.Conn) {
 
 func echo(cmd string, conn net.Conn) error {
 	_, err := conn.Write([]byte(cmd))
-	if (err != nil) {
+	if err != nil {
 		return err
 	}
 
@@ -79,8 +77,8 @@ func readCommand(conn net.Conn) (string, error) {
 	var buffer []byte = make([]byte, 512)
 
 	size, err := conn.Read(buffer)
-	
-	if (err != nil) {
+
+	if err != nil {
 		return "", err
 	}
 

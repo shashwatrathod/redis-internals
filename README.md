@@ -13,8 +13,8 @@ Redis Internals is a Go project that mimics the functionality of Redis, inspired
 ## Features
 
 - RESP decoding for various data types (integers, strings, bulk strings, and arrays)
-- TCP server to handle incoming connections
-- Command-line flag configuration for server settings
+- Error handling
+- See [supported commands](#supported-commands) for a list of available commands.
 
 ## Installation
 
@@ -44,6 +44,18 @@ To run the Redis Internals server, use the following command:
     ```sh
     redis-internals -host <host> -port <port>
     ```
+
+This project is meant to be a drop-in replacement for an actual Redis server. So you can interact
+with the server using the `redis-cli` utility.
+
+```sh
+redis-cli -h <host> -p <port> PING hello
+```
+See [supported commands](#supported-commands) for a list of available commands to try!
+
+## Supported Commands
+
+- [PING](https://redis.io/docs/latest/commands/ping/)
 
 ## Technologies Used
 

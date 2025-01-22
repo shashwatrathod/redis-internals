@@ -2,14 +2,15 @@ package core
 
 import (
 	"errors"
+	"fmt"
 )
 
 const (
-	RespSimpleStringIdentifier = '+'
-	RespSimpleErrorIdentifier  = '-'
-	RespIntegerIdentifier      = ':'
-	RespBulkStringIdentifier   = '$'
-	RespArrayIdentifier        = '*'
+	RespSimpleStringIdentifier byte = '+'
+	RespSimpleErrorIdentifier  byte = '-'
+	RespIntegerIdentifier      byte = ':'
+	RespBulkStringIdentifier   byte = '$'
+	RespArrayIdentifier        byte = '*'
 )
 
 // Decodes a RESP encoded simple string
@@ -167,4 +168,19 @@ func findCarriageReturnIdx(data []byte, startPos int) int {
 	}
 
 	return crIdx
+}
+
+func Encode(val interface{}, isSimpleStr bool) []byte {
+	switch value := val.(type) {
+	case string:
+		if isSimpleStr {
+			return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleStringIdentifier, value))
+		} else {
+			return []byte(fmt.Sprintf("%c%d\r\n%s\r\n", RespBulkStringIdentifier, len(value), value))
+		}
+	case error:
+		return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleErrorIdentifier, value))
+	default:
+		return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleErrorIdentifier, value))
+	}
 }

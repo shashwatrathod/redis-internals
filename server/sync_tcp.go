@@ -15,7 +15,7 @@ var concurrent_clients = 0
 
 // Starts a simple TCP server that accepts incoming connections
 // and handles commands.
-func RunMultiThreadedSyncTcpServer() {
+func RunSyncTcpServer() {
 	address := fmt.Sprintf("%s:%d", config.Host, config.Port)
 
 	log.Println("Starting Simple TCP Server at ", address)
@@ -109,5 +109,10 @@ func decodeArrayString(data []byte) ([]string, error) {
 }
 
 func respond(cmd *core.RedisCmd, c net.Conn) {
-	// todo : implement
+	err := core.EvalAndRespond(cmd, c)
+
+	if err != nil {
+		encodedError := core.Encode(err, false)
+		c.Write(encodedError)
+	}
 }

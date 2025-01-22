@@ -19,5 +19,5 @@ func setupFlags() {
 func main() {
 	setupFlags()
 	log.Println("getting started")
-	server.RunMultiThreadedSyncTcpServer()
+	server.RunSyncTcpServer()
 }

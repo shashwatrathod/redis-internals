@@ -5,8 +5,10 @@ import (
 	"io"
 	"log"
 	"net"
+	"strings"
 
 	"github.com/shashwatrathod/redis-internals/config"
+	"github.com/shashwatrathod/redis-internals/core"
 )
 
 var concurrent_clients = 0
@@ -38,7 +40,7 @@ func RunMultiThreadedSyncTcpServer() {
 		concurrent_clients += 1
 		log.Println("Client connected with address:", conn.RemoteAddr(), "; concurrent clients = ", concurrent_clients)
 
-		go handleConnection(conn)
+		handleConnection(conn)
 	}
 }
 
@@ -56,31 +58,56 @@ func handleConnection(conn net.Conn) {
 			log.Println("Error", err)
 		}
 
-		log.Println("Command : ", cmd)
-		err = echo(cmd, conn)
+		respond(cmd, conn)
 		if err != nil {
 			log.Println("Error while sending response: ", err)
 		}
 	}
 }
 
-func echo(cmd string, conn net.Conn) error {
-	_, err := conn.Write([]byte(cmd))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func readCommand(conn net.Conn) (string, error) {
+// reads a single RESP-encoded command from the connection, decodes it,
+// and returns a `RedisCmd`.
+func readCommand(conn net.Conn) (*core.RedisCmd, error) {
 	var buffer []byte = make([]byte, 512)
 
 	size, err := conn.Read(buffer)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(buffer[:size]), nil
+	log.Println("Raw input: ", fmt.Sprintf("%q", buffer[:size]))
+	tokens, err := decodeArrayString(buffer[:size])
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &core.RedisCmd{
+		Cmd:  strings.ToUpper(tokens[0]),
+		Args: tokens[1:],
+	}, nil
+}
+
+// Decodes the provided RESP-encoded bytes into a
+// slice of decoded string tokens.
+func decodeArrayString(data []byte) ([]string, error) {
+	decodedVal, err := core.Decode(data)
+
+	if err != nil {
+		return []string{}, err
+	}
+
+	decodedValues := decodedVal.([]interface{})
+
+	decodedArray := make([]string, len(decodedValues))
+	for i, v := range decodedValues {
+		decodedArray[i] = v.(string)
+	}
+
+	return decodedArray, nil
+}
+
+func respond(cmd *core.RedisCmd, c net.Conn) {
+	// todo : implement
 }

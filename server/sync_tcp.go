@@ -67,16 +67,18 @@ func handleConnection(conn net.Conn) {
 
 // reads a single RESP-encoded command from the connection, decodes it,
 // and returns a `RedisCmd`.
-func readCommand(conn net.Conn) (*core.RedisCmd, error) {
+func readCommand(c io.ReadWriter) (*core.RedisCmd, error) {
 	var buffer []byte = make([]byte, 512)
 
-	size, err := conn.Read(buffer)
+	size, err := c.Read(buffer)
 
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println("Raw input: ", fmt.Sprintf("%q", buffer[:size]))
+	if config.LogRequest {
+		log.Println("Raw input: ", fmt.Sprintf("%q", buffer[:size]))
+	}
 	tokens, err := decodeArrayString(buffer[:size])
 
 	if err != nil {
@@ -108,7 +110,7 @@ func decodeArrayString(data []byte) ([]string, error) {
 	return decodedArray, nil
 }
 
-func respond(cmd *core.RedisCmd, c net.Conn) {
+func respond(cmd *core.RedisCmd, c io.ReadWriter) {
 	err := core.EvalAndRespond(cmd, c)
 
 	if err != nil {

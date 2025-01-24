@@ -1,7 +1,7 @@
 package core
 
 import (
-	"net"
+	"io"
 
 	"github.com/shashwatrathod/redis-internals/rediserrors"
 )
@@ -12,7 +12,7 @@ import (
 // Parameters:
 //   - args: Arguments passed to the PING command.
 //   - conn: the client connection object to respond to.
-func handlePing(args []string, conn net.Conn) error {
+func handlePing(args []string, c io.ReadWriter) error {
 	if len(args) >= 2 {
 		return rediserrors.WrongNumberOfArguments(CmdPing)
 	}
@@ -25,17 +25,17 @@ func handlePing(args []string, conn net.Conn) error {
 		response = Encode(args[0], false)
 	}
 
-	_, err := conn.Write(response)
+	_, err := c.Write(response)
 
 	return err
 }
 
 // EvalAndRespond processes the specified Redis command and sends the appropriate
 // response over the provided network connection.
-func EvalAndRespond(cmd *RedisCmd, conn net.Conn) error {
+func EvalAndRespond(cmd *RedisCmd, c io.ReadWriter) error {
 	switch cmd.Cmd {
 	case CmdPing:
-		return handlePing(cmd.Args, conn)
+		return handlePing(cmd.Args, c)
 	default:
 		return rediserrors.UnknownCommand(cmd.Cmd, cmd.Args)
 	}

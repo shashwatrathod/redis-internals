@@ -12,6 +12,7 @@ import (
 func setupFlags() {
 	flag.StringVar(&config.Host, "host", "0.0.0.0", "host for the redis server.")
 	flag.IntVar(&config.Port, "port", 7379, "port for the redis server.")
+	flag.BoolVar(&config.LogRequest, "log_request", false, "whether to log raw request body.")
 	flag.Parse()
 }
 
@@ -19,5 +20,5 @@ func setupFlags() {
 func main() {
 	setupFlags()
 	log.Println("getting started")
-	server.RunSyncTcpServer()
+	server.RunAsyncTcpServer()
 }

@@ -180,17 +180,50 @@ func findCarriageReturnIdx(data []byte, startPos int) int {
 	return crIdx
 }
 
-func Encode(val interface{}, isSimpleStr bool) []byte {
+// Encodes the given val into an RESP-formatted bytearray with the provided
+// dataType.
+//
+// Parameters:
+//   - val : the value to be encoded
+//   - dataType : the datatype of the RESP encoded value.
+func EncodeRespWithDatatype(val interface{}, dataType SupportedRespDataTypes) []byte {
+	valStr := fmt.Sprintf("%v", val)
+
+	switch dataType {
+	case SimpleString:
+		return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleStringIdentifier, valStr))
+	case BulkString:
+		return []byte(fmt.Sprintf("%c%d\r\n%s\r\n", RespBulkStringIdentifier, len(valStr), valStr))
+	case Integer:
+		return []byte(fmt.Sprintf("%c%s\r\n", RespIntegerIdentifier, valStr))
+	case SimpleError:
+		return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleErrorIdentifier, valStr))
+	default:
+		return EncodeRespWithDatatype(valStr, SimpleError)
+	}
+}
+
+// Infers the type of supplied "val" and encodes it into
+// appropriate RESP-formatted string.
+//
+// Parameters:
+//   - val : the value to be encoded
+//   - isSimpleStr : if the val is a string, should it be treated as a Simple String
+//
+// Returns: The RESP encoded value.
+func EncodeResp(val interface{}, isSimpleStr bool) []byte {
 	switch value := val.(type) {
 	case string:
 		if isSimpleStr {
-			return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleStringIdentifier, value))
+			return EncodeRespWithDatatype(value, SimpleString)
 		} else {
-			return []byte(fmt.Sprintf("%c%d\r\n%s\r\n", RespBulkStringIdentifier, len(value), value))
+			return EncodeRespWithDatatype(value, BulkString)
 		}
+	case int:
+		return EncodeRespWithDatatype(value, Integer)
 	case error:
-		return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleErrorIdentifier, value))
+		return EncodeRespWithDatatype(value, SimpleError)
 	default:
-		return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleErrorIdentifier, value))
+		return EncodeRespWithDatatype(value, SimpleError)
 	}
 }

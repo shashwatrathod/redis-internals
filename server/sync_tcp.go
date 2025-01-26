@@ -114,7 +114,7 @@ func respond(cmd *core.RedisCmd, c io.ReadWriter) {
 	err := core.EvalAndRespond(cmd, c)
 
 	if err != nil {
-		encodedError := core.Encode(err, false)
+		encodedError := core.EncodeResp(err, false)
 		c.Write(encodedError)
 	}
 }

@@ -24,9 +24,9 @@ func handlePing(args []string, c io.ReadWriter) error {
 	var response []byte
 
 	if len(args) == 0 {
-		response = Encode("PONG", true)
+		response = EncodeResp("PONG", true)
 	} else {
-		response = Encode(args[0], false)
+		response = EncodeResp(args[0], false)
 	}
 
 	_, err := c.Write(response)
@@ -55,7 +55,7 @@ func handleGet(args []string, c io.ReadWriter) error {
 		return nil
 	}
 
-	c.Write(Encode(val.value, false))
+	c.Write(EncodeResp(val.value, false))
 	return nil
 }
 
@@ -108,7 +108,7 @@ func handleSet(args []string, c io.ReadWriter) error {
 		expiry:    expiryTime,
 	}
 	Put(key, val)
-	c.Write(Encode("OK", true))
+	c.Write(EncodeResp("OK", true))
 	return nil
 }
 

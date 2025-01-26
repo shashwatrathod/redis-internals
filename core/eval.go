@@ -35,7 +35,28 @@ func handlePing(args []string, c io.ReadWriter) error {
 }
 
 func handleGet(args []string, c io.ReadWriter) error {
-	return errors.New("unimplemented")
+	if len(args) != 1 {
+		return commons.WrongNumberOfArgumentsErr(CMD_GET)
+	}
+
+	key := args[0]
+
+	val := Get(key)
+
+	// If the Key doesn't exist in the store
+	if val == nil {
+		c.Write([]byte("$-1\r\n"))
+		return nil
+	}
+
+	// If the Key exists but the Value is expired.
+	if val.expiry != nil && val.expiry.IsExpired() {
+		c.Write([]byte("$-1\r\n"))
+		return nil
+	}
+
+	c.Write(Encode(val.value, false))
+	return nil
 }
 
 // Parses the arguments to the SET command. Sets the Key with the specified value

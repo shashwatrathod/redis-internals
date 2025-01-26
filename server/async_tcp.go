@@ -9,6 +9,8 @@ import (
 	"github.com/shashwatrathod/redis-internals/core"
 )
 
+// GREAT video on FDs https://www.youtube.com/watch?v=-gP58pozNuM
+
 const (
 	max_concurrent_clients = 20000
 )

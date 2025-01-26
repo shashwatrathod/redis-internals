@@ -8,5 +8,8 @@ type RedisCmd struct {
 }
 
 const (
-	CmdPing = "PING"
+	CMD_PING = "PING"
+	CMD_GET  = "GET"
+	CMD_TTL  = "TTL"
+	CMD_SET  = "SET"
 )

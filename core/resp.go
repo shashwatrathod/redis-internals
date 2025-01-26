@@ -13,6 +13,16 @@ const (
 	RespArrayIdentifier        byte = '*'
 )
 
+type SupportedRespDataTypes int
+
+const (
+	SimpleString SupportedRespDataTypes = iota
+	BulkString
+	SimpleError
+	RespArray
+	RespInteger
+)
+
 // Decodes a RESP encoded simple string
 // and returns the decoded string, delta and error(if any)
 func decodeRespSimpleString(data []byte, startPos int) (string, int, error) {

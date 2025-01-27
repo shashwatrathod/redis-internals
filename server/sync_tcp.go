@@ -8,7 +8,9 @@ import (
 	"strings"
 
 	"github.com/shashwatrathod/redis-internals/config"
-	"github.com/shashwatrathod/redis-internals/core"
+	"github.com/shashwatrathod/redis-internals/core/commandhandler"
+	"github.com/shashwatrathod/redis-internals/core/commands"
+	"github.com/shashwatrathod/redis-internals/core/resp"
 )
 
 var concurrent_clients = 0
@@ -67,7 +69,7 @@ func handleConnection(conn net.Conn) {
 
 // reads a single RESP-encoded command from the connection, decodes it,
 // and returns a `RedisCmd`.
-func readCommand(c io.ReadWriter) (*core.RedisCmd, error) {
+func readCommand(c io.ReadWriter) (*commands.RedisCmd, error) {
 	var buffer []byte = make([]byte, 512)
 
 	size, err := c.Read(buffer)
@@ -85,7 +87,7 @@ func readCommand(c io.ReadWriter) (*core.RedisCmd, error) {
 		return nil, err
 	}
 
-	return &core.RedisCmd{
+	return &commands.RedisCmd{
 		Cmd:  strings.ToUpper(tokens[0]),
 		Args: tokens[1:],
 	}, nil
@@ -94,7 +96,7 @@ func readCommand(c io.ReadWriter) (*core.RedisCmd, error) {
 // Decodes the provided RESP-encoded bytes into a
 // slice of decoded string tokens.
 func decodeArrayString(data []byte) ([]string, error) {
-	decodedVal, err := core.Decode(data)
+	decodedVal, err := resp.Decode(data)
 
 	if err != nil {
 		return []string{}, err
@@ -110,11 +112,11 @@ func decodeArrayString(data []byte) ([]string, error) {
 	return decodedArray, nil
 }
 
-func respond(cmd *core.RedisCmd, c io.ReadWriter) {
-	err := core.EvalAndRespond(cmd, c)
+func respond(cmd *commands.RedisCmd, c io.ReadWriter) {
+	err := commandhandler.EvalAndRespond(cmd, c)
 
 	if err != nil {
-		encodedError := core.EncodeResp(err, false)
+		encodedError := resp.Encode(err, false)
 		c.Write(encodedError)
 	}
 }

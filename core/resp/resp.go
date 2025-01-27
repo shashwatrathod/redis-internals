@@ -1,26 +1,8 @@
-package core
+package resp
 
 import (
 	"errors"
 	"fmt"
-)
-
-const (
-	RespSimpleStringIdentifier byte = '+'
-	RespSimpleErrorIdentifier  byte = '-'
-	RespIntegerIdentifier      byte = ':'
-	RespBulkStringIdentifier   byte = '$'
-	RespArrayIdentifier        byte = '*'
-)
-
-type SupportedRespDataTypes int
-
-const (
-	SimpleString SupportedRespDataTypes = iota
-	BulkString
-	SimpleError
-	RespArray
-	RespInteger
 )
 
 // Decodes a RESP encoded simple string
@@ -186,7 +168,7 @@ func findCarriageReturnIdx(data []byte, startPos int) int {
 // Parameters:
 //   - val : the value to be encoded
 //   - dataType : the datatype of the RESP encoded value.
-func EncodeRespWithDatatype(val interface{}, dataType SupportedRespDataTypes) []byte {
+func EncodeWithDatatype(val interface{}, dataType RespDataTypes) []byte {
 	valStr := fmt.Sprintf("%v", val)
 
 	switch dataType {
@@ -199,7 +181,7 @@ func EncodeRespWithDatatype(val interface{}, dataType SupportedRespDataTypes) []
 	case SimpleError:
 		return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleErrorIdentifier, valStr))
 	default:
-		return EncodeRespWithDatatype(valStr, SimpleError)
+		return EncodeWithDatatype(valStr, SimpleError)
 	}
 }
 
@@ -211,19 +193,19 @@ func EncodeRespWithDatatype(val interface{}, dataType SupportedRespDataTypes) []
 //   - isSimpleStr : if the val is a string, should it be treated as a Simple String
 //
 // Returns: The RESP encoded value.
-func EncodeResp(val interface{}, isSimpleStr bool) []byte {
+func Encode(val interface{}, isSimpleStr bool) []byte {
 	switch value := val.(type) {
 	case string:
 		if isSimpleStr {
-			return EncodeRespWithDatatype(value, SimpleString)
+			return EncodeWithDatatype(value, SimpleString)
 		} else {
-			return EncodeRespWithDatatype(value, BulkString)
+			return EncodeWithDatatype(value, BulkString)
 		}
 	case int:
-		return EncodeRespWithDatatype(value, RespInteger)
+		return EncodeWithDatatype(value, RespInteger)
 	case error:
-		return EncodeRespWithDatatype(value, SimpleError)
+		return EncodeWithDatatype(value, SimpleError)
 	default:
-		return EncodeRespWithDatatype(value, SimpleError)
+		return EncodeWithDatatype(value, SimpleError)
 	}
 }

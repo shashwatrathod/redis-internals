@@ -6,7 +6,7 @@ import (
 	"syscall"
 
 	"github.com/shashwatrathod/redis-internals/config"
-	"github.com/shashwatrathod/redis-internals/core"
+	redisio "github.com/shashwatrathod/redis-internals/core/io"
 )
 
 // GREAT video on FDs https://www.youtube.com/watch?v=-gP58pozNuM
@@ -124,7 +124,7 @@ func RunAsyncTcpServer() error {
 				}
 			} else {
 				// This means we have a new event on the Client's FD.
-				comm := &core.FDComm{
+				comm := &redisio.FDComm{
 					Fd: int(event.Fd),
 				}
 

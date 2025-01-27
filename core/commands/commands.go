@@ -1,4 +1,4 @@
-package core
+package commands
 
 type RedisCmd struct {
 	// Represents a Redis Command such as "PING", "GET", "SET", etc.
@@ -6,10 +6,3 @@ type RedisCmd struct {
 	// Represents the arguments to the given Cmd
 	Args []string
 }
-
-const (
-	CMD_PING = "PING"
-	CMD_GET  = "GET"
-	CMD_TTL  = "TTL"
-	CMD_SET  = "SET"
-)

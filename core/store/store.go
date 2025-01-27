@@ -1,21 +1,24 @@
-package core
+package store
 
-import "github.com/shashwatrathod/redis-internals/utils"
+import (
+	"github.com/shashwatrathod/redis-internals/core/resp"
+	"github.com/shashwatrathod/redis-internals/utils"
+)
 
 // Represents the DataTypes currently supported by the Application.
 type SupportedDatatypes int
 
 const (
-	String  SupportedDatatypes = SupportedDatatypes(BulkString)
-	Integer                    = RespInteger
-	Array                      = RespArray
+	String  SupportedDatatypes = SupportedDatatypes(resp.BulkString)
+	Integer                    = resp.RespInteger
+	Array                      = resp.RespArray
 )
 
 // Represents a Value that can be stored in the datastore.
 type Value struct {
-	value     interface{}
-	valueType SupportedDatatypes
-	expiry    *utils.ExpiryTime
+	Value     interface{}
+	ValueType SupportedDatatypes
+	Expiry    *utils.ExpiryTime
 }
 
 var store map[string]*Value

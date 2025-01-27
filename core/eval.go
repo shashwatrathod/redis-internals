@@ -34,6 +34,16 @@ func handlePing(args []string, c io.ReadWriter) error {
 	return err
 }
 
+// handleGet processes the GET command in Redis, which retrieves the value of a specified key.
+// If the key does not exist, it returns a nil response. If the key exists but the value is expired,
+// it also returns a nil response. Otherwise, it returns the value associated with the key.
+//
+// Arguments:
+//   - args: A slice of strings containing the command arguments. It should contain exactly one element, the key.
+//   - c: An io.ReadWriter interface used to write the response.
+//
+// Returns:
+//   - An error if the number of arguments is incorrect, otherwise nil.
 func handleGet(args []string, c io.ReadWriter) error {
 	if len(args) != 1 {
 		return commons.WrongNumberOfArgumentsErr(CMD_GET)
@@ -59,8 +69,28 @@ func handleGet(args []string, c io.ReadWriter) error {
 	return nil
 }
 
-// Parses the arguments to the SET command. Sets the Key with the specified value
-// in the datastore.
+// handleSet handles the SET command in Redis, which sets the value of a key.
+// If the key already holds a value, it is overwritten, regardless of its type.
+//
+// Syntax:
+// SET key value [EX seconds] [PX milliseconds]
+//
+// The command supports the following options:
+//   - EX seconds: Set the specified expire time, in seconds.
+//   - PX milliseconds: Set the specified expire time, in milliseconds.
+//
+// Example usage:
+// SET mykey "Hello"
+// SET mykey "Hello" EX 10
+// SET mykey "Hello" PX 10000
+//
+// Parameters:
+//   - args: A slice of strings containing the command arguments. The first argument is the key, the second is the value,
+//     and optional arguments can specify the expiration time in seconds (EX) or milliseconds (PX).
+//   - c: An io.ReadWriter interface for reading from and writing to the client.
+//
+// Returns:
+//   - An error if the command is malformed or if there are issues with parsing the expiration time.
 func handleSet(args []string, c io.ReadWriter) error {
 
 	if len(args) < 2 {
@@ -112,8 +142,49 @@ func handleSet(args []string, c io.ReadWriter) error {
 	return nil
 }
 
+// handleTtl handles the TTL (Time to Live) command for a given key in the Redis store.
+// It returns the remaining time to live of a key that has a timeout.
+//
+// Behavior:
+//   - If the key does not exist, it writes -2 to the client.
+//   - If the key exists but has no associated expiry, it writes -1 to the client.
+//   - If the key exists and has an associated expiry that has not yet passed, it writes the remaining time to live in seconds to the client.
+//
+// Arguments:
+//   - args: A slice of strings where the first element is the key for which TTL is to be checked.
+//   - c: An io.ReadWriter interface used for reading from and writing to the client.
+//
+// Returns:
+//   - An error if the number of arguments is incorrect.
 func handleTtl(args []string, c io.ReadWriter) error {
-	return errors.New("unimplemented")
+	if len(args) != 1 {
+		return commons.WrongNumberOfArgumentsErr(CMD_GET)
+	}
+
+	key := args[0]
+
+	val := Get(key)
+
+	// If the Key doesn't exist in the store
+	if val == nil {
+		c.Write(EncodeRespWithDatatype(-2, RespInteger))
+		return nil
+	}
+
+	// The Key exists but there is no expiry associated with it.
+	if val.expiry == nil {
+		c.Write(EncodeRespWithDatatype(-1, RespInteger))
+		return nil
+	}
+
+	// The expiry has already passed.
+	if val.expiry != nil && val.expiry.IsExpired() {
+		c.Write(EncodeRespWithDatatype(-2, RespInteger))
+		return nil
+	}
+
+	c.Write(EncodeRespWithDatatype(val.expiry.GetTimeRemainingInSeconds(), RespInteger))
+	return nil
 }
 
 // EvalAndRespond processes the specified Redis command and sends the appropriate

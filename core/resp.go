@@ -194,7 +194,7 @@ func EncodeRespWithDatatype(val interface{}, dataType SupportedRespDataTypes) []
 		return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleStringIdentifier, valStr))
 	case BulkString:
 		return []byte(fmt.Sprintf("%c%d\r\n%s\r\n", RespBulkStringIdentifier, len(valStr), valStr))
-	case Integer:
+	case RespInteger:
 		return []byte(fmt.Sprintf("%c%s\r\n", RespIntegerIdentifier, valStr))
 	case SimpleError:
 		return []byte(fmt.Sprintf("%c%s\r\n", RespSimpleErrorIdentifier, valStr))
@@ -220,7 +220,7 @@ func EncodeResp(val interface{}, isSimpleStr bool) []byte {
 			return EncodeRespWithDatatype(value, BulkString)
 		}
 	case int:
-		return EncodeRespWithDatatype(value, Integer)
+		return EncodeRespWithDatatype(value, RespInteger)
 	case error:
 		return EncodeRespWithDatatype(value, SimpleError)
 	default:

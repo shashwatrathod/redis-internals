@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/shashwatrathod/redis-internals/commons"
-	"github.com/shashwatrathod/redis-internals/core/commands"
+	"github.com/shashwatrathod/redis-internals/core/eval"
 	"github.com/shashwatrathod/redis-internals/core/resp"
 	"github.com/shashwatrathod/redis-internals/core/store"
 	"github.com/shashwatrathod/redis-internals/utils"
@@ -21,7 +21,7 @@ import (
 //   - c: the client connection object to respond to.
 func handlePing(args []string, c io.ReadWriter) error {
 	if len(args) >= 2 {
-		return commons.WrongNumberOfArgumentsErr(commands.PING)
+		return commons.WrongNumberOfArgumentsErr(eval.PING)
 	}
 
 	var response []byte
@@ -49,7 +49,7 @@ func handlePing(args []string, c io.ReadWriter) error {
 //   - An error if the number of arguments is incorrect, otherwise nil.
 func handleGet(args []string, c io.ReadWriter) error {
 	if len(args) != 1 {
-		return commons.WrongNumberOfArgumentsErr(commands.GET)
+		return commons.WrongNumberOfArgumentsErr(eval.GET)
 	}
 
 	key := args[0]
@@ -97,7 +97,7 @@ func handleGet(args []string, c io.ReadWriter) error {
 func handleSet(args []string, c io.ReadWriter) error {
 
 	if len(args) < 2 {
-		return commons.WrongNumberOfArgumentsErr(strings.ToLower(commands.SET))
+		return commons.WrongNumberOfArgumentsErr(strings.ToLower(eval.SET))
 	}
 
 	// Key and Value are always the 1st and 2nd arguments.
@@ -110,7 +110,7 @@ func handleSet(args []string, c io.ReadWriter) error {
 		arg := strings.ToLower(args[i])
 
 		switch arg {
-		case commands.EX:
+		case eval.EX:
 			i++
 			if i >= len(args) || expiryTime != nil {
 				return commons.SyntaxErr()
@@ -120,7 +120,7 @@ func handleSet(args []string, c io.ReadWriter) error {
 				return errors.New("ERR value is not an integer or out of range")
 			}
 			expiryTime = utils.FromExpiryInSeconds(expiryInSeconds)
-		case commands.PX:
+		case eval.PX:
 			i++
 			if i >= len(args) || expiryTime != nil {
 				return commons.SyntaxErr()
@@ -161,7 +161,7 @@ func handleSet(args []string, c io.ReadWriter) error {
 //   - An error if the number of arguments is incorrect.
 func handleTtl(args []string, c io.ReadWriter) error {
 	if len(args) != 1 {
-		return commons.WrongNumberOfArgumentsErr(commands.GET)
+		return commons.WrongNumberOfArgumentsErr(eval.GET)
 	}
 
 	key := args[0]
@@ -192,15 +192,15 @@ func handleTtl(args []string, c io.ReadWriter) error {
 
 // EvalAndRespond processes the specified Redis command and sends the appropriate
 // response over the provided network connection.
-func EvalAndRespond(cmd *commands.RedisCmd, c io.ReadWriter) error {
+func EvalAndRespond(cmd *eval.RedisCmd, c io.ReadWriter) error {
 	switch cmd.Cmd {
-	case commands.PING:
+	case eval.PING:
 		return handlePing(cmd.Args, c)
-	case commands.GET:
+	case eval.GET:
 		return handleGet(cmd.Args, c)
-	case commands.SET:
+	case eval.SET:
 		return handleSet(cmd.Args, c)
-	case commands.TTL:
+	case eval.TTL:
 		return handleTtl(cmd.Args, c)
 	default:
 		return commons.UnknownCommandErr(cmd.Cmd, cmd.Args)

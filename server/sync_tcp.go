@@ -9,7 +9,7 @@ import (
 
 	"github.com/shashwatrathod/redis-internals/config"
 	"github.com/shashwatrathod/redis-internals/core/commandhandler"
-	"github.com/shashwatrathod/redis-internals/core/commands"
+	"github.com/shashwatrathod/redis-internals/core/eval"
 	"github.com/shashwatrathod/redis-internals/core/resp"
 )
 
@@ -69,7 +69,7 @@ func handleConnection(conn net.Conn) {
 
 // reads a single RESP-encoded command from the connection, decodes it,
 // and returns a `RedisCmd`.
-func readCommand(c io.ReadWriter) (*commands.RedisCmd, error) {
+func readCommand(c io.ReadWriter) (*eval.RedisCmd, error) {
 	var buffer []byte = make([]byte, 512)
 
 	size, err := c.Read(buffer)
@@ -87,7 +87,7 @@ func readCommand(c io.ReadWriter) (*commands.RedisCmd, error) {
 		return nil, err
 	}
 
-	return &commands.RedisCmd{
+	return &eval.RedisCmd{
 		Cmd:  strings.ToUpper(tokens[0]),
 		Args: tokens[1:],
 	}, nil
@@ -112,7 +112,7 @@ func decodeArrayString(data []byte) ([]string, error) {
 	return decodedArray, nil
 }
 
-func respond(cmd *commands.RedisCmd, c io.ReadWriter) {
+func respond(cmd *eval.RedisCmd, c io.ReadWriter) {
 	err := commandhandler.EvalAndRespond(cmd, c)
 
 	if err != nil {

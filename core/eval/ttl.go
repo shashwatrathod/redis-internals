@@ -6,6 +6,8 @@ import (
 	"github.com/shashwatrathod/redis-internals/core/store"
 )
 
+// evaluates the TTL (Time to Live) command for a given key in the Redis store.
+// It returns the remaining time to live of a key that has a timeout.
 func evalTtl(args []string) *EvalResult {
 	if len(args) != 1 {
 		return &EvalResult{

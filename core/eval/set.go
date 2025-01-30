@@ -11,6 +11,8 @@ import (
 	"github.com/shashwatrathod/redis-internals/utils"
 )
 
+// evalSet processes the SET command with optional arguments to control expiry and insertion.
+// Returns an EvalResult with the operation status.
 func evalSet(args []string) *EvalResult {
 	if len(args) < 2 {
 		return &EvalResult{

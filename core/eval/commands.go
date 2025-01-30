@@ -1,5 +1,7 @@
 package eval
 
+import "log"
+
 type RedisCmd struct {
 	// Represents a Redis Command such as "PING", "GET", "SET", etc.
 	Cmd string
@@ -63,5 +65,12 @@ func init() {
 	CommandMap[TTL] = &Command{
 		Name: TTL,
 		Eval: evalTtl,
+	}
+
+	// Validate that all commands have a non-nil Eval function
+	for name, cmd := range CommandMap {
+		if cmd.Eval == nil {
+			log.Fatalf("Command %s has a nil Eval function", name)
+		}
 	}
 }

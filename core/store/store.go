@@ -34,3 +34,11 @@ func Put(key string, value *Value) {
 func Get(key string) *Value {
 	return store[key]
 }
+
+func Delete(key string) bool {
+	if _, exists := store[key]; exists {
+		delete(store, key)
+		return true
+	}
+	return false
+}

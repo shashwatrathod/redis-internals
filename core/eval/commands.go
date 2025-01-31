@@ -34,6 +34,7 @@ const (
 	GET  = "GET"
 	TTL  = "TTL"
 	SET  = "SET"
+	DEL  = "DEL"
 )
 
 // supported command arguments
@@ -65,6 +66,11 @@ func init() {
 	CommandMap[TTL] = &Command{
 		Name: TTL,
 		Eval: evalTtl,
+	}
+
+	CommandMap[DEL] = &Command{
+		Name: DEL,
+		Eval: evalDel,
 	}
 
 	// Validate that all commands have a non-nil Eval function

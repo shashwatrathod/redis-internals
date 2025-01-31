@@ -201,7 +201,7 @@ func Encode(val interface{}, isSimpleStr bool) []byte {
 		} else {
 			return EncodeWithDatatype(value, BulkString)
 		}
-	case int:
+	case int, int16, int32, int64, int8:
 		return EncodeWithDatatype(value, RespInteger)
 	case error:
 		return EncodeWithDatatype(value, SimpleError)

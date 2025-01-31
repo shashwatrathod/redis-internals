@@ -3,6 +3,7 @@ package eval
 import (
 	"github.com/shashwatrathod/redis-internals/commons"
 	"github.com/shashwatrathod/redis-internals/core/resp"
+	"github.com/shashwatrathod/redis-internals/core/store"
 )
 
 // Evaluates the response to the 'PING' command and responds
@@ -10,7 +11,7 @@ import (
 //
 // Parameters:
 //   - args: Arguments passed to the PING command.
-func evalPing(args []string) *EvalResult {
+func evalPing(args []string, s *store.Store) *EvalResult {
 	if len(args) >= 2 {
 		return &EvalResult{
 			Error:    commons.WrongNumberOfArgumentsErr(PING),

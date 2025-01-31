@@ -8,7 +8,7 @@ import (
 
 // evalDel processes the DEL command and deletes the keys passed in the arguments from the store.
 // Returns the number of keys deleted in the result.
-func evalDel(args []string) *EvalResult {
+func evalDel(args []string, s *store.Store) *EvalResult {
 	if len(args) == 0 {
 		return &EvalResult{
 			Error:    commons.WrongNumberOfArgumentsErr(DEL),
@@ -19,7 +19,7 @@ func evalDel(args []string) *EvalResult {
 	nDeleted := 0
 
 	for _, key := range args {
-		if isDeleted := store.Delete(key); isDeleted {
+		if isDeleted := s.Delete(key); isDeleted {
 			nDeleted++
 		}
 	}

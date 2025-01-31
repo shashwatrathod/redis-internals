@@ -1,6 +1,10 @@
 package eval
 
-import "log"
+import (
+	"log"
+
+	"github.com/shashwatrathod/redis-internals/core/store"
+)
 
 type RedisCmd struct {
 	// Represents a Redis Command such as "PING", "GET", "SET", etc.
@@ -25,16 +29,17 @@ type Command struct {
 
 	// Evaluates the command by executing the core logic and
 	// returns the results from the execution.
-	Eval func(args []string) *EvalResult
+	Eval func(args []string, s *store.Store) *EvalResult
 }
 
 // supported commands
 const (
-	PING = "PING"
-	GET  = "GET"
-	TTL  = "TTL"
-	SET  = "SET"
-	DEL  = "DEL"
+	PING   = "PING"
+	GET    = "GET"
+	TTL    = "TTL"
+	SET    = "SET"
+	DEL    = "DEL"
+	EXPIRE = "EXPIRE"
 )
 
 // supported command arguments
@@ -71,6 +76,11 @@ func init() {
 	CommandMap[DEL] = &Command{
 		Name: DEL,
 		Eval: evalDel,
+	}
+
+	CommandMap[EXPIRE] = &Command{
+		Name: EXPIRE,
+		Eval: evalExpire,
 	}
 
 	// Validate that all commands have a non-nil Eval function

@@ -14,6 +14,10 @@ const (
 	Array                      = resp.RespArray
 )
 
+type Store struct {
+	data map[string]*Value
+}
+
 // Represents a Value that can be stored in the datastore.
 type Value struct {
 	Value     interface{}
@@ -21,23 +25,29 @@ type Value struct {
 	Expiry    *utils.ExpiryTime
 }
 
-var store map[string]*Value
+var storeInstance *Store
 
-func init() {
-	store = make(map[string]*Value)
+func GetStore() *Store {
+	if storeInstance == nil {
+		storeInstance = &Store{
+			data: make(map[string]*Value),
+		}
+	}
+
+	return storeInstance
 }
 
-func Put(key string, value *Value) {
-	store[key] = value
+func (s *Store) Put(key string, value *Value) {
+	s.data[key] = value
 }
 
-func Get(key string) *Value {
-	return store[key]
+func (s *Store) Get(key string) *Value {
+	return s.data[key]
 }
 
-func Delete(key string) bool {
-	if _, exists := store[key]; exists {
-		delete(store, key)
+func (s *Store) Delete(key string) bool {
+	if _, exists := s.data[key]; exists {
+		delete(s.data, key)
 		return true
 	}
 	return false

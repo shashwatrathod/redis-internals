@@ -1,12 +1,19 @@
 package server
 
 import (
+	"fmt"
+	"io"
 	"log"
 	"net"
+	"strings"
 	"syscall"
 
 	"github.com/shashwatrathod/redis-internals/config"
+	"github.com/shashwatrathod/redis-internals/core/commandhandler"
+	"github.com/shashwatrathod/redis-internals/core/eval"
 	redisio "github.com/shashwatrathod/redis-internals/core/io"
+	"github.com/shashwatrathod/redis-internals/core/resp"
+	"github.com/shashwatrathod/redis-internals/core/store"
 )
 
 // GREAT video on FDs https://www.youtube.com/watch?v=-gP58pozNuM
@@ -73,6 +80,8 @@ func RunAsyncTcpServer() error {
 	log.Println("Sucessfully started the server.")
 	log.Printf("Listening on %s:%d...\n", config.Host, config.Port)
 
+	var s *store.Store = store.GetStore()
+
 	concurrent_clients := 0
 
 	var events []syscall.EpollEvent = make([]syscall.EpollEvent, max_concurrent_clients)
@@ -135,10 +144,64 @@ func RunAsyncTcpServer() error {
 					continue
 				}
 
-				respond(command, comm)
+				respond(command, s, comm)
 			}
 		}
 	}
 
 	return nil
+}
+
+// reads a single RESP-encoded command from the connection, decodes it,
+// and returns a `RedisCmd`.
+func readCommand(c io.ReadWriter) (*eval.RedisCmd, error) {
+	var buffer []byte = make([]byte, 512)
+
+	size, err := c.Read(buffer)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if config.LogRequest {
+		log.Println("Raw input: ", fmt.Sprintf("%q", buffer[:size]))
+	}
+	tokens, err := decodeArrayString(buffer[:size])
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &eval.RedisCmd{
+		Cmd:  strings.ToUpper(tokens[0]),
+		Args: tokens[1:],
+	}, nil
+}
+
+// Decodes the provided RESP-encoded bytes into a
+// slice of decoded string tokens.
+func decodeArrayString(data []byte) ([]string, error) {
+	decodedVal, err := resp.Decode(data)
+
+	if err != nil {
+		return []string{}, err
+	}
+
+	decodedValues := decodedVal.([]interface{})
+
+	decodedArray := make([]string, len(decodedValues))
+	for i, v := range decodedValues {
+		decodedArray[i] = v.(string)
+	}
+
+	return decodedArray, nil
+}
+
+func respond(cmd *eval.RedisCmd, s *store.Store, c io.ReadWriter) {
+	err := commandhandler.EvalAndRespond(cmd, s, c)
+
+	if err != nil {
+		encodedError := resp.Encode(err, false)
+		c.Write(encodedError)
+	}
 }

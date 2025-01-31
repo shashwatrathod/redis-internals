@@ -13,7 +13,7 @@ import (
 
 // evalSet processes the SET command with optional arguments to control expiry and insertion.
 // Returns an EvalResult with the operation status.
-func evalSet(args []string) *EvalResult {
+func evalSet(args []string, s *store.Store) *EvalResult {
 	if len(args) < 2 {
 		return &EvalResult{
 			Error:    commons.WrongNumberOfArgumentsErr(SET),
@@ -77,7 +77,7 @@ func evalSet(args []string) *EvalResult {
 		Expiry:    expiryTime,
 	}
 
-	store.Put(key, val)
+	s.Put(key, val)
 
 	return &EvalResult{
 		Response: resp.Encode("OK", true),

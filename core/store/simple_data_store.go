@@ -26,3 +26,7 @@ func (s *SimpleDataStore) Delete(key string) bool {
 	}
 	return false
 }
+
+func (s *SimpleDataStore) Reset() {
+	s.data = make(map[string]*Value)
+}

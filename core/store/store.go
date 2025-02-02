@@ -18,6 +18,7 @@ type Store interface {
 	Put(key string, value *Value)
 	Get(key string) *Value
 	Delete(key string) bool
+	Reset()
 }
 
 // Represents a Value that can be stored in the datastore.

@@ -21,8 +21,8 @@ jobs:
       with:
         go-version-file: 'go.mod'
 
-    - name: Install Mockery
-      run: go install github.com/vektra/mockery/v2@latest
+    - name: Install Dependencies
+      run: go install github.com/vektra/mockery/v2@latest && go install github.com/onsi/ginkgo/v2
       
     - name: Install Task
       uses: arduino/setup-task@v2

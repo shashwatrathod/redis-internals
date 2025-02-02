@@ -42,7 +42,7 @@ func evalExpire(args []string, s *store.Store) *EvalResult {
 		}
 	}
 
-	val := s.Get(key)
+	val := (*s).Get(key)
 
 	if val == nil {
 		return ttlNotSetResponse()

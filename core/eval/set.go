@@ -77,7 +77,7 @@ func evalSet(args []string, s *store.Store) *EvalResult {
 		Expiry:    expiryTime,
 	}
 
-	s.Put(key, val)
+	(*s).Put(key, val)
 
 	return &EvalResult{
 		Response: resp.Encode("OK", true),

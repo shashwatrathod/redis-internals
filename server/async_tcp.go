@@ -80,7 +80,7 @@ func RunAsyncTcpServer() error {
 	log.Println("Sucessfully started the server.")
 	log.Printf("Listening on %s:%d...\n", config.Host, config.Port)
 
-	var s *store.Store = store.GetStore()
+	var s store.Store = store.GetStore()
 
 	concurrent_clients := 0
 
@@ -144,7 +144,7 @@ func RunAsyncTcpServer() error {
 					continue
 				}
 
-				respond(command, s, comm)
+				respond(command, &s, comm)
 			}
 		}
 	}

@@ -14,8 +14,10 @@ const (
 	Array                      = resp.RespArray
 )
 
-type Store struct {
-	data map[string]*Value
+type Store interface {
+	Put(key string, value *Value)
+	Get(key string) *Value
+	Delete(key string) bool
 }
 
 // Represents a Value that can be stored in the datastore.
@@ -25,30 +27,14 @@ type Value struct {
 	Expiry    *utils.ExpiryTime
 }
 
-var storeInstance *Store
+var storeInstance *SimpleDataStore
 
-func GetStore() *Store {
+func GetStore() *SimpleDataStore {
 	if storeInstance == nil {
-		storeInstance = &Store{
+		storeInstance = &SimpleDataStore{
 			data: make(map[string]*Value),
 		}
 	}
 
 	return storeInstance
-}
-
-func (s *Store) Put(key string, value *Value) {
-	s.data[key] = value
-}
-
-func (s *Store) Get(key string) *Value {
-	return s.data[key]
-}
-
-func (s *Store) Delete(key string) bool {
-	if _, exists := s.data[key]; exists {
-		delete(s.data, key)
-		return true
-	}
-	return false
 }

@@ -18,7 +18,7 @@ func evalTtl(args []string, s *store.Store) *EvalResult {
 
 	key := args[0]
 
-	val := s.Get(key)
+	val := (*s).Get(key)
 
 	// If the Key doesn't exist in the store
 	if val == nil {

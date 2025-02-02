@@ -19,7 +19,7 @@ func evalDel(args []string, s *store.Store) *EvalResult {
 	nDeleted := 0
 
 	for _, key := range args {
-		if isDeleted := s.Delete(key); isDeleted {
+		if isDeleted := (*s).Delete(key); isDeleted {
 			nDeleted++
 		}
 	}

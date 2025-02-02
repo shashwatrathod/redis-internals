@@ -1,0 +1,27 @@
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - go build -o ./build/redis-internals main.go
+    desc: Build the application
+
+  test:
+    cmds:
+      - mockery && ginkgo -r
+    desc: Run tests
+
+  clean:
+    cmds:
+      - rm -f ./build/redis-internals
+    desc: Clean the build artifacts
+
+  brun:
+    cmds:
+      - task: build
+      - ./build/redis-internals
+    desc: Build and run the application
+
+  run:
+    cmds:
+      - go run main.go

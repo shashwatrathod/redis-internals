@@ -1,5 +1,7 @@
 package store
 
+import "log"
+
 type SimpleDataStore struct {
 	data map[string]*Value
 }
@@ -29,4 +31,38 @@ func (s *SimpleDataStore) Delete(key string) bool {
 
 func (s *SimpleDataStore) Reset() {
 	s.data = make(map[string]*Value)
+}
+
+func (s *SimpleDataStore) expireSample() float32 {
+	var nExpired int = 0
+	var nSearched int = 0
+
+	for key, val := range s.data {
+		if val.Expiry != nil {
+			nSearched++
+
+			if val.Expiry.IsExpired() {
+				s.Delete(key)
+				nExpired++
+			}
+		}
+
+		if nSearched == AUTO_EXPIRE_SEARCH_LIMIT {
+			break
+		}
+	}
+
+	return float32(nExpired) / float32(AUTO_EXPIRE_SEARCH_LIMIT)
+}
+
+func (s *SimpleDataStore) AutoDeleteExpiredKeys() {
+	for {
+		fracExpired := s.expireSample()
+
+		if fracExpired < AUTO_EXPIRE_ALLOWABLE_EXPIRE_FRACTION {
+			break
+		}
+	}
+
+	log.Println("auto-deleted the expired but undeleted keys. total keys", len(s.data))
 }

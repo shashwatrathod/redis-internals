@@ -7,6 +7,7 @@ import (
 	"net"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/shashwatrathod/redis-internals/config"
 	"github.com/shashwatrathod/redis-internals/core/commandhandler"
@@ -19,8 +20,11 @@ import (
 // GREAT video on FDs https://www.youtube.com/watch?v=-gP58pozNuM
 
 const (
-	max_concurrent_clients = 20000
+	max_concurrent_clients               = 20000
+	cron_frequency         time.Duration = 1 * time.Second
 )
+
+var lastCronExecutionTs time.Time = time.Now()
 
 func RunAsyncTcpServer() error {
 	log.Println("Initializing the server on ", config.Host, ":", config.Port)
@@ -87,6 +91,12 @@ func RunAsyncTcpServer() error {
 	var events []syscall.EpollEvent = make([]syscall.EpollEvent, max_concurrent_clients)
 
 	for {
+
+		if time.Now().After(lastCronExecutionTs.Add(cron_frequency)) {
+			s.AutoDeleteExpiredKeys()
+			lastCronExecutionTs = time.Now()
+		}
+
 		// Wait for new events to be captured.
 		nevents, e := syscall.EpollWait(epollFd, events, -1)
 		if e != nil {

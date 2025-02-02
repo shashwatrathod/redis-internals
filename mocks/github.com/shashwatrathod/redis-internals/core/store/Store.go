@@ -20,6 +20,38 @@ func (_m *Store) EXPECT() *Store_Expecter {
 	return &Store_Expecter{mock: &_m.Mock}
 }
 
+// AutoDeleteExpiredKeys provides a mock function with no fields
+func (_m *Store) AutoDeleteExpiredKeys() {
+	_m.Called()
+}
+
+// Store_AutoDeleteExpiredKeys_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AutoDeleteExpiredKeys'
+type Store_AutoDeleteExpiredKeys_Call struct {
+	*mock.Call
+}
+
+// AutoDeleteExpiredKeys is a helper method to define mock.On call
+func (_e *Store_Expecter) AutoDeleteExpiredKeys() *Store_AutoDeleteExpiredKeys_Call {
+	return &Store_AutoDeleteExpiredKeys_Call{Call: _e.mock.On("AutoDeleteExpiredKeys")}
+}
+
+func (_c *Store_AutoDeleteExpiredKeys_Call) Run(run func()) *Store_AutoDeleteExpiredKeys_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Store_AutoDeleteExpiredKeys_Call) Return() *Store_AutoDeleteExpiredKeys_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Store_AutoDeleteExpiredKeys_Call) RunAndReturn(run func()) *Store_AutoDeleteExpiredKeys_Call {
+	_c.Run(run)
+	return _c
+}
+
 // Delete provides a mock function with given fields: key
 func (_m *Store) Delete(key string) bool {
 	ret := _m.Called(key)

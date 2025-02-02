@@ -19,10 +19,16 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'
+        go-version-file: 'go.mod'
+      
+    - name: Install Task
+      uses: arduino/setup-task@v2
+      with:
+        version: 3.x
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build
-      run: go build -v ./...
+      run: task build
 
     - name: Test
-      run: go test -v ./...
+      run: task test

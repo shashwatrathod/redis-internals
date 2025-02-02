@@ -1,0 +1,11 @@
+quiet: False
+disable-version-string: True
+with-expecter: True
+mockname: "{{.InterfaceName}}"
+filename: "{{.MockName}}.go"
+outpkg: mocks
+packages:
+    github.com/shashwatrathod/redis-internals/core/store:
+      interfaces:
+        Store:
+              

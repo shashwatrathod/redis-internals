@@ -29,7 +29,7 @@ func evalGet(args []string, s store.Store) *EvalResult {
 		}
 	}
 
-	// If the Key exists but the Value is expired.
+	// If the Key exists but the Value is expired. This edge case should techincally never occur.
 	if val.Expiry != nil && val.Expiry.IsExpired() {
 		return &EvalResult{
 			Response: []byte("$-1\r\n"),

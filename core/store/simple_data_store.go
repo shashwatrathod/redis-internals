@@ -9,6 +9,13 @@ func (s *SimpleDataStore) Put(key string, value *Value) {
 }
 
 func (s *SimpleDataStore) Get(key string) *Value {
+	val := s.data[key]
+
+	// Passively delete a key if it found to be expired.
+	if val != nil && val.Expiry != nil && val.Expiry.IsExpired() {
+		s.Delete(key)
+	}
+
 	return s.data[key]
 }
 

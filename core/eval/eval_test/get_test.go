@@ -14,7 +14,7 @@ import (
 
 func TestEvalGet(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "eval.GET Suite")
+	RunSpecs(t, "Eval Suite")
 }
 
 var _ = Describe("CommandMap.GET", func() {

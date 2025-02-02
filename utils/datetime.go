@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"math"
 	"time"
 )
 
@@ -36,7 +37,7 @@ func (et ExpiryTime) GetTimeRemainingInSeconds() int64 {
 		return -2
 	}
 
-	return int64(timeRemaining.Seconds())
+	return int64(math.Round(timeRemaining.Seconds()))
 }
 
 // Returns true if the expiry time has already passed.

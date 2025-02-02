@@ -10,7 +10,7 @@ import (
 
 // EvalAndRespond processes the specified Redis command and sends the appropriate
 // response over the provided network connection.
-func EvalAndRespond(cmd *eval.RedisCmd, s *store.Store, c io.ReadWriter) error {
+func EvalAndRespond(cmd *eval.RedisCmd, s store.Store, c io.ReadWriter) error {
 	var command *eval.Command = eval.CommandMap[cmd.Cmd]
 
 	if command == nil || command.Eval == nil {

@@ -25,7 +25,7 @@ func ttlSetResponse() *EvalResult {
 
 // Evaluates the EXPIRE command by setting the TTL to the given value
 // on the provided key.
-func evalExpire(args []string, s *store.Store) *EvalResult {
+func evalExpire(args []string, s store.Store) *EvalResult {
 	if len(args) < 2 {
 		return &EvalResult{
 			Error:    commons.WrongNumberOfArgumentsErr(EXPIRE),
@@ -42,7 +42,7 @@ func evalExpire(args []string, s *store.Store) *EvalResult {
 		}
 	}
 
-	val := (*s).Get(key)
+	val := s.Get(key)
 
 	if val == nil {
 		return ttlNotSetResponse()

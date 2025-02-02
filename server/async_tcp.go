@@ -144,7 +144,7 @@ func RunAsyncTcpServer() error {
 					continue
 				}
 
-				respond(command, &s, comm)
+				respond(command, s, comm)
 			}
 		}
 	}
@@ -197,7 +197,7 @@ func decodeArrayString(data []byte) ([]string, error) {
 	return decodedArray, nil
 }
 
-func respond(cmd *eval.RedisCmd, s *store.Store, c io.ReadWriter) {
+func respond(cmd *eval.RedisCmd, s store.Store, c io.ReadWriter) {
 	err := commandhandler.EvalAndRespond(cmd, s, c)
 
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 //
 // Parameters:
 //   - args: Arguments passed to the PING command.
-func evalPing(args []string, s *store.Store) *EvalResult {
+func evalPing(args []string, s store.Store) *EvalResult {
 	if len(args) >= 2 {
 		return &EvalResult{
 			Error:    commons.WrongNumberOfArgumentsErr(PING),

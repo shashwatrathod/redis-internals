@@ -29,7 +29,7 @@ type Command struct {
 
 	// Evaluates the command by executing the core logic and
 	// returns the results from the execution.
-	Eval func(args []string, s *store.Store) *EvalResult
+	Eval func(args []string, s store.Store) *EvalResult
 }
 
 // supported commands

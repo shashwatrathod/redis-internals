@@ -8,7 +8,7 @@ import (
 
 // evaluates the TTL (Time to Live) command for a given key in the Redis store.
 // It returns the remaining time to live of a key that has a timeout.
-func evalTtl(args []string, s *store.Store) *EvalResult {
+func evalTtl(args []string, s store.Store) *EvalResult {
 	if len(args) != 1 {
 		return &EvalResult{
 			Error:    commons.WrongNumberOfArgumentsErr(GET),
@@ -18,7 +18,7 @@ func evalTtl(args []string, s *store.Store) *EvalResult {
 
 	key := args[0]
 
-	val := (*s).Get(key)
+	val := s.Get(key)
 
 	// If the Key doesn't exist in the store
 	if val == nil {

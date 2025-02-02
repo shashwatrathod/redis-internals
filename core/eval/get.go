@@ -9,7 +9,7 @@ import (
 // evalGet evaluates the GET command for the Redis server.
 // The GET command returns the value of the specified key. If the key does not exist,
 // it returns a special nil value.
-func evalGet(args []string, s *store.Store) *EvalResult {
+func evalGet(args []string, s store.Store) *EvalResult {
 	if len(args) != 1 {
 		return &EvalResult{
 			Response: nil,
@@ -19,7 +19,7 @@ func evalGet(args []string, s *store.Store) *EvalResult {
 
 	key := args[0]
 
-	val := (*s).Get(key)
+	val := s.Get(key)
 
 	// If the Key doesn't exist in the store
 	if val == nil {

@@ -8,7 +8,7 @@ tasks:
 
   test:
     cmds:
-      - mockery && ginkgo -r
+      - mockery && go test ./...
     desc: Run tests
 
   clean:

@@ -11,7 +11,7 @@ import (
 func evalTtl(args []string, s store.Store) *EvalResult {
 	if len(args) != 1 {
 		return &EvalResult{
-			Error:    commons.WrongNumberOfArgumentsErr(GET),
+			Error:    commons.WrongNumberOfArgumentsErr(TTL),
 			Response: nil,
 		}
 	}

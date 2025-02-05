@@ -98,6 +98,39 @@ func (_c *Store_Delete_Call) RunAndReturn(run func(string) bool) *Store_Delete_C
 	return _c
 }
 
+// ForEach provides a mock function with given fields: _a0
+func (_m *Store) ForEach(_a0 func(string, *store.Value) bool) {
+	_m.Called(_a0)
+}
+
+// Store_ForEach_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ForEach'
+type Store_ForEach_Call struct {
+	*mock.Call
+}
+
+// ForEach is a helper method to define mock.On call
+//   - _a0 func(string , *store.Value) bool
+func (_e *Store_Expecter) ForEach(_a0 interface{}) *Store_ForEach_Call {
+	return &Store_ForEach_Call{Call: _e.mock.On("ForEach", _a0)}
+}
+
+func (_c *Store_ForEach_Call) Run(run func(_a0 func(string, *store.Value) bool)) *Store_ForEach_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(func(string, *store.Value) bool))
+	})
+	return _c
+}
+
+func (_c *Store_ForEach_Call) Return() *Store_ForEach_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Store_ForEach_Call) RunAndReturn(run func(func(string, *store.Value) bool)) *Store_ForEach_Call {
+	_c.Run(run)
+	return _c
+}
+
 // Get provides a mock function with given fields: key
 func (_m *Store) Get(key string) *store.Value {
 	ret := _m.Called(key)

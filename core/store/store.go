@@ -37,6 +37,10 @@ type Store interface {
 
 	// resets the data in the store. DELETES all the keys. WARNING : Irreversable operation!
 	Reset()
+
+	// Executes the function for each key value pair in the datastore.
+	// The fn should return false if the iteration is to be terminated early, else true.
+	ForEach(func(key string, value *Value) bool)
 }
 
 // Represents a Value that can be stored in the datastore.

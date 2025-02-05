@@ -66,3 +66,11 @@ func (s *SimpleDataStore) AutoDeleteExpiredKeys() {
 
 	log.Println("auto-deleted the expired but undeleted keys. total keys", len(s.data))
 }
+
+func (s *SimpleDataStore) ForEach(fn func(key string, value *Value) bool) {
+	for k, v := range s.data {
+		if !fn(k, v) {
+			break
+		}
+	}
+}

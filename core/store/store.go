@@ -55,7 +55,8 @@ var storeInstance *SimpleDataStore
 func GetStore() *SimpleDataStore {
 	if storeInstance == nil {
 		storeInstance = &SimpleDataStore{
-			data: make(map[string]*Value),
+			data:                 make(map[string]*Value),
+			autoDeletionStrategy: NewRandomSampleAutoDeletionStrategy(AUTO_EXPIRE_SEARCH_LIMIT, AUTO_EXPIRE_ALLOWABLE_EXPIRE_FRACTION), // TODO Make this configurable through additional config params or constructors.
 		}
 	}
 

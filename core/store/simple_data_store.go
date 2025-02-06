@@ -1,20 +1,37 @@
 package store
 
+import "time"
+
 type SimpleDataStore struct {
 	data                 map[string]*Value
 	autoDeletionStrategy AutoDeletionStrategy
+	keyMetadata          map[string]*KeyMetadata
 }
 
 func (s *SimpleDataStore) Put(key string, value *Value) {
+
+	var keyMetadata *KeyMetadata = newKeyMetadata()
+
+	if s.data[key] != nil && s.keyMetadata[key] != nil {
+		keyMetadata = s.GetKeyMetadata(key)
+		// Update the LastAccessedTs to Now if the key already exists.
+		keyMetadata.LastAccessedTimestamp = time.Now()
+	}
+
 	s.data[key] = value
+	s.keyMetadata[key] = keyMetadata
 }
 
 func (s *SimpleDataStore) Get(key string) *Value {
 	val := s.data[key]
 
-	// Passively delete a key if it found to be expired.
+	// Passively delete a key if it is found to be expired.
 	if val != nil && val.Expiry != nil && val.Expiry.IsExpired() {
 		s.Delete(key)
+	}
+
+	if metadata := s.GetKeyMetadata(key); metadata != nil {
+		metadata.LastAccessedTimestamp = time.Now()
 	}
 
 	return s.data[key]
@@ -23,6 +40,7 @@ func (s *SimpleDataStore) Get(key string) *Value {
 func (s *SimpleDataStore) Delete(key string) bool {
 	if _, exists := s.data[key]; exists {
 		delete(s.data, key)
+		delete(s.keyMetadata, key)
 		return true
 	}
 	return false
@@ -30,6 +48,7 @@ func (s *SimpleDataStore) Delete(key string) bool {
 
 func (s *SimpleDataStore) Reset() {
 	s.data = make(map[string]*Value)
+	s.keyMetadata = make(map[string]*KeyMetadata)
 }
 
 func (s *SimpleDataStore) AutoDeleteExpiredKeys() {
@@ -42,4 +61,8 @@ func (s *SimpleDataStore) ForEach(fn func(key string, value *Value) bool) {
 			break
 		}
 	}
+}
+
+func (s *SimpleDataStore) GetKeyMetadata(key string) *KeyMetadata {
+	return s.keyMetadata[key]
 }

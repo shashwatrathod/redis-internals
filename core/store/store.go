@@ -1,6 +1,8 @@
 package store
 
 import (
+	"time"
+
 	"github.com/shashwatrathod/redis-internals/core/resp"
 	"github.com/shashwatrathod/redis-internals/utils"
 )
@@ -38,9 +40,12 @@ type Store interface {
 	// resets the data in the store. DELETES all the keys. WARNING : Irreversable operation!
 	Reset()
 
-	// Executes the function for each key value pair in the datastore.
-	// The fn should return false if the iteration is to be terminated early, else true.
+	// executes the function for each key value pair in the datastore.
+	// the fn should return false if the iteration is to be terminated early, else true.
 	ForEach(func(key string, value *Value) bool)
+
+	// returns the Metadata for the given key. Metadata contains information like the creation and last-access timestamps.
+	GetKeyMetadata(key string) *KeyMetadata
 }
 
 // Represents a Value that can be stored in the datastore.
@@ -50,12 +55,29 @@ type Value struct {
 	Expiry    *utils.ExpiryTime
 }
 
+// contains information like last-accessed ts and created ts for a key in the store.
+type KeyMetadata struct {
+	// when the key was last accessed. gets updated everytime the key gets updated or fetched (via Get)
+	LastAccessedTimestamp time.Time
+	// when the key was created. it is set when a key gets created. does not get updated if the value is updated.
+	CreatedTimestamp time.Time
+}
+
+// returns a new instance of the KeyMetadata with all timestamps set to current time.
+func newKeyMetadata() *KeyMetadata {
+	return &KeyMetadata{
+		LastAccessedTimestamp: time.Now(),
+		CreatedTimestamp:      time.Now(),
+	}
+}
+
 var storeInstance *SimpleDataStore
 
 func GetStore() *SimpleDataStore {
 	if storeInstance == nil {
 		storeInstance = &SimpleDataStore{
 			data:                 make(map[string]*Value),
+			keyMetadata:          make(map[string]*KeyMetadata),
 			autoDeletionStrategy: NewRandomSampleAutoDeletionStrategy(AUTO_EXPIRE_SEARCH_LIMIT, AUTO_EXPIRE_ALLOWABLE_EXPIRE_FRACTION), // TODO Make this configurable through additional config params or constructors.
 		}
 	}

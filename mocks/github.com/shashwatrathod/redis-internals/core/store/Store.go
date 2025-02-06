@@ -179,6 +179,54 @@ func (_c *Store_Get_Call) RunAndReturn(run func(string) *store.Value) *Store_Get
 	return _c
 }
 
+// GetKeyMetadata provides a mock function with given fields: key
+func (_m *Store) GetKeyMetadata(key string) *store.KeyMetadata {
+	ret := _m.Called(key)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetKeyMetadata")
+	}
+
+	var r0 *store.KeyMetadata
+	if rf, ok := ret.Get(0).(func(string) *store.KeyMetadata); ok {
+		r0 = rf(key)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*store.KeyMetadata)
+		}
+	}
+
+	return r0
+}
+
+// Store_GetKeyMetadata_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetKeyMetadata'
+type Store_GetKeyMetadata_Call struct {
+	*mock.Call
+}
+
+// GetKeyMetadata is a helper method to define mock.On call
+//   - key string
+func (_e *Store_Expecter) GetKeyMetadata(key interface{}) *Store_GetKeyMetadata_Call {
+	return &Store_GetKeyMetadata_Call{Call: _e.mock.On("GetKeyMetadata", key)}
+}
+
+func (_c *Store_GetKeyMetadata_Call) Run(run func(key string)) *Store_GetKeyMetadata_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Store_GetKeyMetadata_Call) Return(_a0 *store.KeyMetadata) *Store_GetKeyMetadata_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Store_GetKeyMetadata_Call) RunAndReturn(run func(string) *store.KeyMetadata) *Store_GetKeyMetadata_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Put provides a mock function with given fields: key, value
 func (_m *Store) Put(key string, value *store.Value) {
 	_m.Called(key, value)

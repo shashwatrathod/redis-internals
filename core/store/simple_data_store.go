@@ -1,14 +1,29 @@
 package store
 
-import "time"
+import (
+	"time"
+
+	"github.com/shashwatrathod/redis-internals/config"
+)
 
 type SimpleDataStore struct {
 	data                 map[string]*Value
 	autoDeletionStrategy AutoDeletionStrategy
+	evictionStrategy     EvictionStrategy
 	keyMetadata          map[string]*KeyMetadata
+	nKeys                int
 }
 
 func (s *SimpleDataStore) Put(key string, value *Value) {
+
+	if s.nKeys >= config.MaxKeys {
+		s.Evict()
+	}
+
+	// todo: better error handling to account for inefficient eviction.
+	if s.nKeys >= config.MaxKeys {
+		return
+	}
 
 	var keyMetadata *KeyMetadata = newKeyMetadata()
 
@@ -49,6 +64,7 @@ func (s *SimpleDataStore) Delete(key string) bool {
 func (s *SimpleDataStore) Reset() {
 	s.data = make(map[string]*Value)
 	s.keyMetadata = make(map[string]*KeyMetadata)
+	s.nKeys = 0
 }
 
 func (s *SimpleDataStore) AutoDeleteExpiredKeys() {
@@ -65,4 +81,8 @@ func (s *SimpleDataStore) ForEach(fn func(key string, value *Value) bool) {
 
 func (s *SimpleDataStore) GetKeyMetadata(key string) *KeyMetadata {
 	return s.keyMetadata[key]
+}
+
+func (s *SimpleDataStore) Evict() {
+	s.evictionStrategy.Execute(s)
 }

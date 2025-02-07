@@ -3,6 +3,7 @@ package store
 import (
 	"time"
 
+	"github.com/shashwatrathod/redis-internals/config"
 	"github.com/shashwatrathod/redis-internals/core/resp"
 	"github.com/shashwatrathod/redis-internals/utils"
 )
@@ -46,6 +47,10 @@ type Store interface {
 
 	// returns the Metadata for the given key. Metadata contains information like the creation and last-access timestamps.
 	GetKeyMetadata(key string) *KeyMetadata
+
+	// identifies a best-candidate key to be evicted from the datastore, and evicts it.
+	// should be used when the storage hits its maximum limit.
+	Evict()
 }
 
 // Represents a Value that can be stored in the datastore.
@@ -79,6 +84,8 @@ func GetStore() *SimpleDataStore {
 			data:                 make(map[string]*Value),
 			keyMetadata:          make(map[string]*KeyMetadata),
 			autoDeletionStrategy: NewRandomSampleAutoDeletionStrategy(AUTO_EXPIRE_SEARCH_LIMIT, AUTO_EXPIRE_ALLOWABLE_EXPIRE_FRACTION), // TODO Make this configurable through additional config params or constructors.
+			evictionStrategy:     NewAllKeysLRUEvictionStrategy(config.LRUEvictionSampleSize),
+			nKeys:                0,
 		}
 	}
 

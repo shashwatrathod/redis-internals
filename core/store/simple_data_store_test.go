@@ -1,10 +1,12 @@
 package store_test
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/shashwatrathod/redis-internals/config"
 	"github.com/shashwatrathod/redis-internals/core/store"
 	"github.com/shashwatrathod/redis-internals/utils"
 )
@@ -36,6 +38,25 @@ var _ = Describe("SimpleDataStore", func() {
 			}
 			dataStore.Put("key", value)
 			Expect(dataStore.Get("key")).To(Equal(value))
+		})
+		It("should evict keys if the datastore is at max capacity", func() {
+			// fill the store to its max capacity
+			for i := 1; i <= config.MaxKeys; i++ {
+				dataStore.Put(fmt.Sprintf("key%d", i+1), &store.Value{
+					Value:     fmt.Sprintf("value%d", i+1),
+					ValueType: store.String,
+					Expiry:    nil,
+				})
+			}
+
+			key := fmt.Sprintf("key%d", config.MaxKeys+1)
+			val := &store.Value{
+				Value:     fmt.Sprintf("value%d", config.MaxKeys+1),
+				ValueType: store.String,
+				Expiry:    nil,
+			}
+			dataStore.Put(key, val)
+			Expect(dataStore.Get(key)).To(Equal(val))
 		})
 	})
 

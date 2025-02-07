@@ -98,6 +98,38 @@ func (_c *Store_Delete_Call) RunAndReturn(run func(string) bool) *Store_Delete_C
 	return _c
 }
 
+// Evict provides a mock function with no fields
+func (_m *Store) Evict() {
+	_m.Called()
+}
+
+// Store_Evict_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Evict'
+type Store_Evict_Call struct {
+	*mock.Call
+}
+
+// Evict is a helper method to define mock.On call
+func (_e *Store_Expecter) Evict() *Store_Evict_Call {
+	return &Store_Evict_Call{Call: _e.mock.On("Evict")}
+}
+
+func (_c *Store_Evict_Call) Run(run func()) *Store_Evict_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Store_Evict_Call) Return() *Store_Evict_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Store_Evict_Call) RunAndReturn(run func()) *Store_Evict_Call {
+	_c.Run(run)
+	return _c
+}
+
 // ForEach provides a mock function with given fields: _a0
 func (_m *Store) ForEach(_a0 func(string, *store.Value) bool) {
 	_m.Called(_a0)

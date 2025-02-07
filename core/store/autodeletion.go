@@ -2,6 +2,7 @@ package store
 
 import "log"
 
+// Auto-deletion mechanism deletes expired keys form the datastore when executed.
 type AutoDeletionStrategy interface {
 	// Executes the Autodeletion strategy onto the inteface
 	Execute(dstore Store)

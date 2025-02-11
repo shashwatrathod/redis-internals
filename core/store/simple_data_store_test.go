@@ -18,7 +18,7 @@ func TestSimpleDataStore(t *testing.T) {
 
 var _ = Describe("SimpleDataStore", func() {
 	var (
-		dataStore *store.SimpleDataStore
+		dataStore *store.DataStore
 	)
 
 	BeforeEach(func() {

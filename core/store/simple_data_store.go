@@ -6,7 +6,7 @@ import (
 	"github.com/shashwatrathod/redis-internals/config"
 )
 
-type SimpleDataStore struct {
+type DataStore struct {
 	data                 map[string]*Value
 	autoDeletionStrategy AutoDeletionStrategy
 	evictionStrategy     EvictionStrategy
@@ -14,7 +14,7 @@ type SimpleDataStore struct {
 	nKeys                int
 }
 
-func (s *SimpleDataStore) Put(key string, value *Value) {
+func (s *DataStore) Put(key string, value *Value) {
 
 	if s.nKeys >= config.MaxKeys {
 		s.Evict()
@@ -37,7 +37,7 @@ func (s *SimpleDataStore) Put(key string, value *Value) {
 	s.keyMetadata[key] = keyMetadata
 }
 
-func (s *SimpleDataStore) Get(key string) *Value {
+func (s *DataStore) Get(key string) *Value {
 	val := s.data[key]
 
 	// Passively delete a key if it is found to be expired.
@@ -52,7 +52,7 @@ func (s *SimpleDataStore) Get(key string) *Value {
 	return s.data[key]
 }
 
-func (s *SimpleDataStore) Delete(key string) bool {
+func (s *DataStore) Delete(key string) bool {
 	if _, exists := s.data[key]; exists {
 		delete(s.data, key)
 		delete(s.keyMetadata, key)
@@ -61,17 +61,17 @@ func (s *SimpleDataStore) Delete(key string) bool {
 	return false
 }
 
-func (s *SimpleDataStore) Reset() {
+func (s *DataStore) Reset() {
 	s.data = make(map[string]*Value)
 	s.keyMetadata = make(map[string]*KeyMetadata)
 	s.nKeys = 0
 }
 
-func (s *SimpleDataStore) AutoDeleteExpiredKeys() {
+func (s *DataStore) AutoDeleteExpiredKeys() {
 	s.autoDeletionStrategy.Execute(s)
 }
 
-func (s *SimpleDataStore) ForEach(fn func(key string, value *Value) bool) {
+func (s *DataStore) ForEach(fn func(key string, value *Value) bool) {
 	for k, v := range s.data {
 		if !fn(k, v) {
 			break
@@ -79,10 +79,10 @@ func (s *SimpleDataStore) ForEach(fn func(key string, value *Value) bool) {
 	}
 }
 
-func (s *SimpleDataStore) GetKeyMetadata(key string) *KeyMetadata {
+func (s *DataStore) GetKeyMetadata(key string) *KeyMetadata {
 	return s.keyMetadata[key]
 }
 
-func (s *SimpleDataStore) Evict() {
+func (s *DataStore) Evict() {
 	s.evictionStrategy.Execute(s)
 }

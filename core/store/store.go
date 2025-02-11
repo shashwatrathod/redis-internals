@@ -76,11 +76,11 @@ func newKeyMetadata() *KeyMetadata {
 	}
 }
 
-var storeInstance *SimpleDataStore
+var storeInstance *DataStore
 
-func GetStore() *SimpleDataStore {
+func GetStore() *DataStore {
 	if storeInstance == nil {
-		storeInstance = &SimpleDataStore{
+		storeInstance = &DataStore{
 			data:                 make(map[string]*Value),
 			keyMetadata:          make(map[string]*KeyMetadata),
 			autoDeletionStrategy: NewRandomSampleAutoDeletionStrategy(AUTO_EXPIRE_SEARCH_LIMIT, AUTO_EXPIRE_ALLOWABLE_EXPIRE_FRACTION), // TODO Make this configurable through additional config params or constructors.

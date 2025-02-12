@@ -51,6 +51,9 @@ type Store interface {
 	// identifies a best-candidate key to be evicted from the datastore, and evicts it.
 	// should be used when the storage hits its maximum limit.
 	Evict()
+
+	// returns the number of keys present in the datastore at the moment.
+	KeyCount() int
 }
 
 // Represents a Value that can be stored in the datastore.
@@ -85,7 +88,6 @@ func GetStore() *DataStore {
 			keyMetadata:          make(map[string]*KeyMetadata),
 			autoDeletionStrategy: NewRandomSampleAutoDeletionStrategy(AUTO_EXPIRE_SEARCH_LIMIT, AUTO_EXPIRE_ALLOWABLE_EXPIRE_FRACTION), // TODO Make this configurable through additional config params or constructors.
 			evictionStrategy:     NewAllKeysLRUEvictionStrategy(config.LRUEvictionSampleSize),
-			nKeys:                0,
 		}
 	}
 

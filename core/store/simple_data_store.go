@@ -11,17 +11,16 @@ type DataStore struct {
 	autoDeletionStrategy AutoDeletionStrategy
 	evictionStrategy     EvictionStrategy
 	keyMetadata          map[string]*KeyMetadata
-	nKeys                int
 }
 
 func (s *DataStore) Put(key string, value *Value) {
 
-	if s.nKeys >= config.MaxKeys {
+	if s.KeyCount() >= config.MaxKeys {
 		s.Evict()
 	}
 
 	// todo: better error handling to account for inefficient eviction.
-	if s.nKeys >= config.MaxKeys {
+	if s.KeyCount() >= config.MaxKeys {
 		return
 	}
 
@@ -64,7 +63,6 @@ func (s *DataStore) Delete(key string) bool {
 func (s *DataStore) Reset() {
 	s.data = make(map[string]*Value)
 	s.keyMetadata = make(map[string]*KeyMetadata)
-	s.nKeys = 0
 }
 
 func (s *DataStore) AutoDeleteExpiredKeys() {
@@ -85,4 +83,8 @@ func (s *DataStore) GetKeyMetadata(key string) *KeyMetadata {
 
 func (s *DataStore) Evict() {
 	s.evictionStrategy.Execute(s)
+}
+
+func (s *DataStore) KeyCount() int {
+	return len(s.data)
 }

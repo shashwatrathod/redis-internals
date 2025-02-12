@@ -259,6 +259,51 @@ func (_c *Store_GetKeyMetadata_Call) RunAndReturn(run func(string) *store.KeyMet
 	return _c
 }
 
+// KeyCount provides a mock function with no fields
+func (_m *Store) KeyCount() int {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for KeyCount")
+	}
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func() int); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	return r0
+}
+
+// Store_KeyCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'KeyCount'
+type Store_KeyCount_Call struct {
+	*mock.Call
+}
+
+// KeyCount is a helper method to define mock.On call
+func (_e *Store_Expecter) KeyCount() *Store_KeyCount_Call {
+	return &Store_KeyCount_Call{Call: _e.mock.On("KeyCount")}
+}
+
+func (_c *Store_KeyCount_Call) Run(run func()) *Store_KeyCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Store_KeyCount_Call) Return(_a0 int) *Store_KeyCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Store_KeyCount_Call) RunAndReturn(run func() int) *Store_KeyCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Put provides a mock function with given fields: key, value
 func (_m *Store) Put(key string, value *store.Value) {
 	_m.Called(key, value)

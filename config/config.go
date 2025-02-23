@@ -13,6 +13,9 @@ var MaxKeys int = 100
 
 // eviction policy config parameters
 
+// defines the maximum resolution for the Least Recently Used (LRU) cache eviction policy.
+var LRUTimeResolution uint32 = 0x00FFFFFF
+
 // ratio of keys to be evicted everytime the an eviction is performed.
 var EvictionRatio float32 = 0.20
 

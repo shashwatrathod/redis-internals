@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/shashwatrathod/redis-internals/core/store"
 	mocks "github.com/shashwatrathod/redis-internals/mocks/github.com/shashwatrathod/redis-internals/core/store"
+	"github.com/shashwatrathod/redis-internals/utils"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -39,13 +40,13 @@ var _ = Describe("AllKeysLRUEvictionStrategy", func() {
 		}).Return()
 
 		mockStore.On("GetKeyMetadata", "key1").Return(&store.KeyMetadata{
-			LastAccessedTimestamp: time.Now().Add(-10 * time.Minute),
+			LastAccessedTimestamp: utils.ToLRUTime(time.Now().Add(-10 * time.Minute)),
 		})
 		mockStore.On("GetKeyMetadata", "key2").Return(&store.KeyMetadata{
-			LastAccessedTimestamp: time.Now().Add(-5 * time.Minute),
+			LastAccessedTimestamp: utils.ToLRUTime(time.Now().Add(-5 * time.Minute)),
 		})
 		mockStore.On("GetKeyMetadata", "key3").Return(&store.KeyMetadata{
-			LastAccessedTimestamp: time.Now().Add(-1 * time.Minute),
+			LastAccessedTimestamp: utils.ToLRUTime(time.Now().Add(-1 * time.Minute)),
 		})
 
 		mockStore.On("Delete", "key1").Return(true)
@@ -81,7 +82,7 @@ var _ = Describe("AllKeysLRUEvictionStrategy", func() {
 			fn("key3", &store.Value{})
 		}).Return()
 
-		sameTime := time.Now().Add(-10 * time.Minute)
+		sameTime := utils.ToLRUTime(time.Now().Add(-10 * time.Minute))
 		mockStore.On("GetKeyMetadata", "key1").Return(&store.KeyMetadata{
 			LastAccessedTimestamp: sameTime,
 		})
@@ -115,7 +116,7 @@ var _ = Describe("AllKeysLRUEvictionStrategy", func() {
 
 		for i := 1; i <= nkeys; i++ {
 			mockStore.On("GetKeyMetadata", fmt.Sprintf("key-%d", i)).Return(&store.KeyMetadata{
-				LastAccessedTimestamp: time.Now().Add(-time.Duration(i) * time.Minute),
+				LastAccessedTimestamp: utils.ToLRUTime(time.Now().Add(-time.Duration(i) * time.Minute)),
 			}).Maybe()
 		}
 

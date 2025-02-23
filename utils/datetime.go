@@ -3,6 +3,8 @@ package utils
 import (
 	"math"
 	"time"
+
+	"github.com/shashwatrathod/redis-internals/config"
 )
 
 // Represents the Expiry Time of a Key in the store.
@@ -48,4 +50,23 @@ func (et ExpiryTime) IsExpired() bool {
 // Returns the expiry timestamp.
 func (et ExpiryTime) GetExpireAtTimestamp() time.Time {
 	return et.expireAtTimestamp
+}
+
+// the LRU-Time is represented as a 32-bit integer.
+type LRUTime uint32
+
+// only the least-significant 24-bits of the LRU-time contain any data.
+// this is inline with redis's implementation of a 24-bit lru clock, making a trade-off between resolution and memory consumption.
+// https://github.com/redis/redis/blob/unstable/src/evict.c
+
+// returns the current time as an LRUTime value.
+// the time is obtained from the current Unix timestamp and is masked
+// with the LRUTimeResolution configuration value to fit the LRU time format.
+func GetCurrentLruTime() LRUTime {
+	return ToLRUTime(time.Now())
+}
+
+// converts the given time instance into LRU time.
+func ToLRUTime(t time.Time) LRUTime {
+	return LRUTime(uint32(t.Unix()) & config.LRUTimeResolution)
 }

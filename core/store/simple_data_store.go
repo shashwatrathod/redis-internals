@@ -2,9 +2,9 @@ package store
 
 import (
 	"log"
-	"time"
 
 	"github.com/shashwatrathod/redis-internals/config"
+	"github.com/shashwatrathod/redis-internals/utils"
 )
 
 type DataStore struct {
@@ -30,7 +30,7 @@ func (s *DataStore) Put(key string, value *Value) {
 	if s.data[key] != nil && s.keyMetadata[key] != nil {
 		keyMetadata = s.GetKeyMetadata(key)
 		// Update the LastAccessedTs to Now if the key already exists.
-		keyMetadata.LastAccessedTimestamp = time.Now()
+		keyMetadata.LastAccessedTimestamp = utils.GetCurrentLruTime()
 	}
 
 	s.data[key] = value
@@ -46,7 +46,7 @@ func (s *DataStore) Get(key string) *Value {
 	}
 
 	if metadata := s.GetKeyMetadata(key); metadata != nil {
-		metadata.LastAccessedTimestamp = time.Now()
+		metadata.LastAccessedTimestamp = utils.GetCurrentLruTime()
 	}
 
 	return s.data[key]

@@ -1,7 +1,7 @@
 package store
 
 import (
-	"time"
+	"github.com/shashwatrathod/redis-internals/utils"
 )
 
 // eviction strategy selects the best key candidate to be deleted from the datastore
@@ -25,7 +25,7 @@ func NewAllKeysLRUEvictionStrategy(sampleSize int) *AllKeysLRUEvictionStrategy {
 
 func (strategy *AllKeysLRUEvictionStrategy) findLeastRecentlyUsedKey(dstore Store) *string {
 	var leastRecentlyUsedKey *string = nil
-	var earliestAccessTime = time.Now()
+	var earliestAccessTime utils.LRUTime = utils.GetCurrentLruTime()
 
 	nKeysScanned := 0
 
@@ -36,7 +36,7 @@ func (strategy *AllKeysLRUEvictionStrategy) findLeastRecentlyUsedKey(dstore Stor
 
 		keyMetadata := dstore.GetKeyMetadata(key)
 
-		if keyMetadata != nil && keyMetadata.LastAccessedTimestamp.Before(earliestAccessTime) {
+		if keyMetadata != nil && uint32(keyMetadata.LastAccessedTimestamp) < uint32(earliestAccessTime) {
 			earliestAccessTime = keyMetadata.LastAccessedTimestamp
 			leastRecentlyUsedKey = &key
 			nKeysScanned++

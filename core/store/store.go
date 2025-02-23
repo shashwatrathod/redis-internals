@@ -67,7 +67,7 @@ type Value struct {
 // contains information like last-accessed ts and created ts for a key in the store.
 type KeyMetadata struct {
 	// when the key was last accessed. gets updated everytime the key gets updated or fetched (via Get)
-	LastAccessedTimestamp time.Time
+	LastAccessedTimestamp utils.LRUTime
 	// when the key was created. it is set when a key gets created. does not get updated if the value is updated.
 	CreatedTimestamp time.Time
 }
@@ -75,7 +75,7 @@ type KeyMetadata struct {
 // returns a new instance of the KeyMetadata with all timestamps set to current time.
 func newKeyMetadata() *KeyMetadata {
 	return &KeyMetadata{
-		LastAccessedTimestamp: time.Now(),
+		LastAccessedTimestamp: utils.GetCurrentLruTime(),
 		CreatedTimestamp:      time.Now(),
 	}
 }

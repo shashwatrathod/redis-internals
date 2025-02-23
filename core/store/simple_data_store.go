@@ -1,6 +1,7 @@
 package store
 
 import (
+	"log"
 	"time"
 
 	"github.com/shashwatrathod/redis-internals/config"
@@ -81,8 +82,14 @@ func (s *DataStore) GetKeyMetadata(key string) *KeyMetadata {
 	return s.keyMetadata[key]
 }
 
-func (s *DataStore) Evict() {
-	s.evictionStrategy.Execute(s)
+func (s *DataStore) Evict() int {
+	nKeysEvicted, err := s.evictionStrategy.Execute(s)
+
+	if err != nil {
+		log.Printf("Encountered an error while trying to evict keys : %s", err.Error())
+	}
+
+	return nKeysEvicted
 }
 
 func (s *DataStore) KeyCount() int {

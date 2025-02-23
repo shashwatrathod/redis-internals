@@ -99,8 +99,21 @@ func (_c *Store_Delete_Call) RunAndReturn(run func(string) bool) *Store_Delete_C
 }
 
 // Evict provides a mock function with no fields
-func (_m *Store) Evict() {
-	_m.Called()
+func (_m *Store) Evict() int {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Evict")
+	}
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func() int); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	return r0
 }
 
 // Store_Evict_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Evict'
@@ -120,13 +133,13 @@ func (_c *Store_Evict_Call) Run(run func()) *Store_Evict_Call {
 	return _c
 }
 
-func (_c *Store_Evict_Call) Return() *Store_Evict_Call {
-	_c.Call.Return()
+func (_c *Store_Evict_Call) Return(_a0 int) *Store_Evict_Call {
+	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Store_Evict_Call) RunAndReturn(run func()) *Store_Evict_Call {
-	_c.Run(run)
+func (_c *Store_Evict_Call) RunAndReturn(run func() int) *Store_Evict_Call {
+	_c.Call.Return(run)
 	return _c
 }
 

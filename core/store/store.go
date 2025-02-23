@@ -48,9 +48,10 @@ type Store interface {
 	// returns the Metadata for the given key. Metadata contains information like the creation and last-access timestamps.
 	GetKeyMetadata(key string) *KeyMetadata
 
-	// identifies a best-candidate key to be evicted from the datastore, and evicts it.
-	// should be used when the storage hits its maximum limit.
-	Evict()
+	// evicts keys from the store based on different eviction strategies.
+	// you can tweak the proportion of keys evicted in each run by modifying the config.EvictionRatio parameter.
+	// returns the number of keys evicted.
+	Evict() int
 
 	// returns the number of keys present in the datastore at the moment.
 	KeyCount() int

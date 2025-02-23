@@ -7,12 +7,12 @@ import (
 // eviction strategy selects the best key candidate to be deleted from the datastore
 // and deletes the key when triggered.
 type EvictionStrategy interface {
-	// executes the eviction strategy on the datastore.
-	Execute(dstore Store)
+	// executes the eviction strategy on the datastore. returns the number of keys evicted
+	Execute(dstore Store) (int, error)
 }
 
 // AllKeysLRUEvictionStrategy implements Redis's allkeys-lru eviction strategy.
-// it uses an approximated LRU algorithm to sample "N" keys and evict the least recently used key out of the sample from the datastore.
+// it uses an approximated LRU algorithm to sample "N" keys and evict the least recently used keys out of the sample from the datastore.
 type AllKeysLRUEvictionStrategy struct {
 	SampleSize int
 }
@@ -48,10 +48,13 @@ func (strategy *AllKeysLRUEvictionStrategy) findLeastRecentlyUsedKey(dstore Stor
 	return leastRecentlyUsedKey
 }
 
-func (strategy *AllKeysLRUEvictionStrategy) Execute(dstore Store) {
+func (strategy *AllKeysLRUEvictionStrategy) Execute(dstore Store) (int, error) {
 	leastRecentlyUsedKey := strategy.findLeastRecentlyUsedKey(dstore)
 
 	if leastRecentlyUsedKey != nil {
 		dstore.Delete(*leastRecentlyUsedKey)
 	}
+
+	// TODO: implement
+	return 0, nil
 }

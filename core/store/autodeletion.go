@@ -1,6 +1,10 @@
 package store
 
-import "log"
+import (
+	"log"
+
+	"github.com/shashwatrathod/redis-internals/utils"
+)
 
 // Auto-deletion mechanism deletes expired keys form the datastore when executed.
 type AutoDeletionStrategy interface {
@@ -35,10 +39,11 @@ func (strategy *RandomSampleAutoDeletionStrategy) expireSample(dstore Store) flo
 
 	// find the keys to be deleted
 	dstore.ForEach(func(key string, val *Value) bool {
-		if val.Expiry != nil {
+		if exp := dstore.GetExpiry(key); exp != nil {
 			nSearched++
 
-			if val.Expiry.IsExpired() {
+			expiry := utils.FromExpiryInUnixTime(*exp)
+			if expiry.IsExpired() {
 				keysToBeDeleted = append(keysToBeDeleted, key)
 			}
 		}

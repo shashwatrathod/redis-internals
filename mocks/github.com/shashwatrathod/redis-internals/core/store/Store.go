@@ -4,6 +4,7 @@ package mocks
 
 import (
 	store "github.com/shashwatrathod/redis-internals/core/store"
+	utils "github.com/shashwatrathod/redis-internals/utils"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -224,6 +225,54 @@ func (_c *Store_Get_Call) RunAndReturn(run func(string) *store.Value) *Store_Get
 	return _c
 }
 
+// GetExpiry provides a mock function with given fields: key
+func (_m *Store) GetExpiry(key string) *int64 {
+	ret := _m.Called(key)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetExpiry")
+	}
+
+	var r0 *int64
+	if rf, ok := ret.Get(0).(func(string) *int64); ok {
+		r0 = rf(key)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*int64)
+		}
+	}
+
+	return r0
+}
+
+// Store_GetExpiry_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetExpiry'
+type Store_GetExpiry_Call struct {
+	*mock.Call
+}
+
+// GetExpiry is a helper method to define mock.On call
+//   - key string
+func (_e *Store_Expecter) GetExpiry(key interface{}) *Store_GetExpiry_Call {
+	return &Store_GetExpiry_Call{Call: _e.mock.On("GetExpiry", key)}
+}
+
+func (_c *Store_GetExpiry_Call) Run(run func(key string)) *Store_GetExpiry_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Store_GetExpiry_Call) Return(_a0 *int64) *Store_GetExpiry_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Store_GetExpiry_Call) RunAndReturn(run func(string) *int64) *Store_GetExpiry_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetKeyMetadata provides a mock function with given fields: key
 func (_m *Store) GetKeyMetadata(key string) *store.KeyMetadata {
 	ret := _m.Called(key)
@@ -317,9 +366,9 @@ func (_c *Store_KeyCount_Call) RunAndReturn(run func() int) *Store_KeyCount_Call
 	return _c
 }
 
-// Put provides a mock function with given fields: key, value
-func (_m *Store) Put(key string, value *store.Value) {
-	_m.Called(key, value)
+// Put provides a mock function with given fields: key, value, expiry
+func (_m *Store) Put(key string, value string, expiry *utils.ExpiryTime) {
+	_m.Called(key, value, expiry)
 }
 
 // Store_Put_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Put'
@@ -329,14 +378,15 @@ type Store_Put_Call struct {
 
 // Put is a helper method to define mock.On call
 //   - key string
-//   - value *store.Value
-func (_e *Store_Expecter) Put(key interface{}, value interface{}) *Store_Put_Call {
-	return &Store_Put_Call{Call: _e.mock.On("Put", key, value)}
+//   - value string
+//   - expiry *utils.ExpiryTime
+func (_e *Store_Expecter) Put(key interface{}, value interface{}, expiry interface{}) *Store_Put_Call {
+	return &Store_Put_Call{Call: _e.mock.On("Put", key, value, expiry)}
 }
 
-func (_c *Store_Put_Call) Run(run func(key string, value *store.Value)) *Store_Put_Call {
+func (_c *Store_Put_Call) Run(run func(key string, value string, expiry *utils.ExpiryTime)) *Store_Put_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(*store.Value))
+		run(args[0].(string), args[1].(string), args[2].(*utils.ExpiryTime))
 	})
 	return _c
 }
@@ -346,7 +396,7 @@ func (_c *Store_Put_Call) Return() *Store_Put_Call {
 	return _c
 }
 
-func (_c *Store_Put_Call) RunAndReturn(run func(string, *store.Value)) *Store_Put_Call {
+func (_c *Store_Put_Call) RunAndReturn(run func(string, string, *utils.ExpiryTime)) *Store_Put_Call {
 	_c.Run(run)
 	return _c
 }
@@ -379,6 +429,40 @@ func (_c *Store_Reset_Call) Return() *Store_Reset_Call {
 }
 
 func (_c *Store_Reset_Call) RunAndReturn(run func()) *Store_Reset_Call {
+	_c.Run(run)
+	return _c
+}
+
+// SetExpiry provides a mock function with given fields: key, expiry
+func (_m *Store) SetExpiry(key string, expiry *utils.ExpiryTime) {
+	_m.Called(key, expiry)
+}
+
+// Store_SetExpiry_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetExpiry'
+type Store_SetExpiry_Call struct {
+	*mock.Call
+}
+
+// SetExpiry is a helper method to define mock.On call
+//   - key string
+//   - expiry *utils.ExpiryTime
+func (_e *Store_Expecter) SetExpiry(key interface{}, expiry interface{}) *Store_SetExpiry_Call {
+	return &Store_SetExpiry_Call{Call: _e.mock.On("SetExpiry", key, expiry)}
+}
+
+func (_c *Store_SetExpiry_Call) Run(run func(key string, expiry *utils.ExpiryTime)) *Store_SetExpiry_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(*utils.ExpiryTime))
+	})
+	return _c
+}
+
+func (_c *Store_SetExpiry_Call) Return() *Store_SetExpiry_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Store_SetExpiry_Call) RunAndReturn(run func(string, *utils.ExpiryTime)) *Store_SetExpiry_Call {
 	_c.Run(run)
 	return _c
 }

@@ -48,15 +48,15 @@ func evalExpire(args []string, s store.Store) *EvalResult {
 		return ttlNotSetResponse()
 	}
 
-	currentExpiry := val.Expiry
+	currentExpiry := s.GetExpiry(key)
 
-	if currentExpiry == nil || val.Expiry.IsExpired() {
+	if currentExpiry == nil || utils.FromExpiryInUnixTime(*currentExpiry).IsExpired() {
 		return ttlNotSetResponse()
 	}
 
 	proposedExpiry := utils.FromExpiryInSeconds(expiryInSeconds)
 
-	val.Expiry = proposedExpiry
+	s.SetExpiry(key, proposedExpiry)
 
 	// TODO: Add support for additional arguments
 

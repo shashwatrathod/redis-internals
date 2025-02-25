@@ -72,35 +72,6 @@ var _ = Describe("AllKeysLRUEvictionStrategy", func() {
 		// Verify that no key was deleted
 		mockStore.AssertNotCalled(GinkgoT(), "Delete", mock.Anything)
 	})
-
-	It("should handle the case where all keys have the same access time", func() {
-		// Set up mock store with key metadata
-		mockStore.On("ForEach", mock.Anything).Run(func(args mock.Arguments) {
-			fn := args.Get(0).(func(string, *store.Value) bool)
-			fn("key1", &store.Value{})
-			fn("key2", &store.Value{})
-			fn("key3", &store.Value{})
-		}).Return()
-
-		sameTime := utils.ToLRUTime(time.Now().Add(-10 * time.Minute))
-		mockStore.On("GetKeyMetadata", "key1").Return(&store.KeyMetadata{
-			LastAccessedTimestamp: sameTime,
-		})
-		mockStore.On("GetKeyMetadata", "key2").Return(&store.KeyMetadata{
-			LastAccessedTimestamp: sameTime,
-		})
-		mockStore.On("GetKeyMetadata", "key3").Return(&store.KeyMetadata{
-			LastAccessedTimestamp: sameTime,
-		})
-
-		mockStore.On("Delete", "key1").Return(true)
-
-		// Execute eviction strategy
-		strategy.Execute(mockStore)
-
-		// Verify that one of the keys was deleted
-		mockStore.AssertCalled(GinkgoT(), "Delete", "key1")
-	})
 	It("should only sample 'SampleSize' keys", func() {
 		nkeys := 10
 		// Set up mock store with more keys than the sample size

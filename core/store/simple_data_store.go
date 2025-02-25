@@ -12,10 +12,10 @@ type DataStore struct {
 	autoDeletionStrategy AutoDeletionStrategy
 	evictionStrategy     EvictionStrategy
 	keyMetadata          map[string]*KeyMetadata
+	expiries             map[string]*int64
 }
 
-func (s *DataStore) Put(key string, value *Value) {
-
+func (s *DataStore) Put(key string, value string, expiry *utils.ExpiryTime) {
 	if s.KeyCount() >= config.MaxKeys {
 		s.Evict()
 	}
@@ -33,15 +33,30 @@ func (s *DataStore) Put(key string, value *Value) {
 		keyMetadata.LastAccessedTimestamp = utils.GetCurrentLruTime()
 	}
 
-	s.data[key] = value
+	s.data[key] = &Value{
+		Value:     value,
+		ValueType: String, // TODO: Add more types
+	}
 	s.keyMetadata[key] = keyMetadata
+
+	s.SetExpiry(key, expiry)
+}
+
+func (s *DataStore) GetExpiry(key string) *int64 {
+	exp, exists := s.expiries[key]
+
+	if !exists || exp == nil {
+		return nil
+	}
+
+	return exp
 }
 
 func (s *DataStore) Get(key string) *Value {
-	val := s.data[key]
+	_, exists := s.data[key]
 
 	// Passively delete a key if it is found to be expired.
-	if val != nil && val.Expiry != nil && val.Expiry.IsExpired() {
+	if exists && s.isExpired(key) {
 		s.Delete(key)
 	}
 
@@ -52,10 +67,38 @@ func (s *DataStore) Get(key string) *Value {
 	return s.data[key]
 }
 
+// returns whether the given key has expired. returns false if the key doesn't exist,
+// or if there is no expiry set on the key.
+func (s *DataStore) isExpired(key string) bool {
+	exp, exists := s.expiries[key]
+
+	if !exists || exp == nil {
+		return false
+	}
+
+	return utils.FromExpiryInUnixTime(*exp).IsExpired()
+}
+
+func (s *DataStore) SetExpiry(key string, expiry *utils.ExpiryTime) {
+
+	if exists := s.Get(key); exists == nil {
+		return
+	}
+
+	if expiry == nil {
+		delete(s.expiries, key)
+		return
+	}
+
+	timestamp := expiry.ToUnixTimestamp()
+	s.expiries[key] = &timestamp
+}
+
 func (s *DataStore) Delete(key string) bool {
 	if _, exists := s.data[key]; exists {
 		delete(s.data, key)
 		delete(s.keyMetadata, key)
+		delete(s.expiries, key)
 		return true
 	}
 	return false
@@ -64,6 +107,7 @@ func (s *DataStore) Delete(key string) bool {
 func (s *DataStore) Reset() {
 	s.data = make(map[string]*Value)
 	s.keyMetadata = make(map[string]*KeyMetadata)
+	s.expiries = make(map[string]*int64)
 }
 
 func (s *DataStore) AutoDeleteExpiredKeys() {

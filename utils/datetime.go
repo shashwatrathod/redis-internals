@@ -19,6 +19,12 @@ func FromExpiryInSeconds(expiryInSeconds int64) *ExpiryTime {
 	return &ExpiryTime{expireAtTimestamp: now}
 }
 
+// returns the ExpiryTime from the unix expiry timestamp.
+func FromExpiryInUnixTime(expiryInUnix int64) *ExpiryTime {
+	expireAt := time.Unix(expiryInUnix, 0)
+	return &ExpiryTime{expireAtTimestamp: expireAt}
+}
+
 // Returns the ExpiryTime after expiryInMs milliseconds from Now.
 func FromExpiryInMilliseconds(expiryInMs int64) *ExpiryTime {
 	now := time.Now()
@@ -50,6 +56,11 @@ func (et ExpiryTime) IsExpired() bool {
 // Returns the expiry timestamp.
 func (et ExpiryTime) GetExpireAtTimestamp() time.Time {
 	return et.expireAtTimestamp
+}
+
+// returns the unix timestamp of the expirytime.
+func (et ExpiryTime) ToUnixTimestamp() int64 {
+	return et.expireAtTimestamp.Unix()
 }
 
 // the LRU-Time is represented as a 32-bit integer.

@@ -71,13 +71,7 @@ func evalSet(args []string, s store.Store) *EvalResult {
 		}
 	}
 
-	var val *store.Value = &store.Value{
-		Value:     value,
-		ValueType: store.String, // Default to String until other datatypes are implemented.
-		Expiry:    expiryTime,
-	}
-
-	s.Put(key, val)
+	s.Put(key, value, expiryTime)
 
 	return &EvalResult{
 		Response: resp.Encode("OK", true),

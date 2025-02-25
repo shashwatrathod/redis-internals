@@ -24,7 +24,7 @@ const (
 
 type Store interface {
 	// sets the values of the given key in the store. Overrites the value if the key already exists.
-	Put(key string, value *Value)
+	Put(key string, value string, expiry *utils.ExpiryTime)
 
 	// returns the value of the given key if it exists in the store, else returns nil.
 	Get(key string) *Value
@@ -32,6 +32,14 @@ type Store interface {
 	// deletes the given key from the store.
 	// returns true if the key was present in the store, else false.
 	Delete(key string) bool
+
+	// returns the expiry timestamp of the given key.
+	// returns null if they key doesn't exist or if there is no expiry set on the key.
+	GetExpiry(key string) *int64
+
+	// sets the expiry of the key to the given value if the key exists.
+	// removes the expiry on the key if expiry==nil.
+	SetExpiry(key string, expiry *utils.ExpiryTime)
 
 	// searches a random sample of AUTO_EXPIRE_SEARCH_LIMIT keys with expiry, and
 	// purges the expired keys. If the % of expired keys is more than AUTO_EXPIRE_ALLOWABLE_EXPIRE_FRACTION,
@@ -61,7 +69,6 @@ type Store interface {
 type Value struct {
 	Value     interface{}
 	ValueType SupportedDatatypes
-	Expiry    *utils.ExpiryTime
 }
 
 // contains information like last-accessed ts and created ts for a key in the store.

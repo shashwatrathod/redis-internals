@@ -34,28 +34,23 @@ var _ = Describe("SimpleDataStore", func() {
 			value := &store.Value{
 				Value:     "value",
 				ValueType: store.String,
-				Expiry:    nil,
 			}
-			dataStore.Put("key", value)
+			dataStore.Put("key", value.Value.(string), nil)
 			Expect(dataStore.Get("key")).To(Equal(value))
 		})
 		It("should evict keys if the datastore is at max capacity", func() {
 			// fill the store to its max capacity
 			for i := 1; i <= config.MaxKeys; i++ {
-				dataStore.Put(fmt.Sprintf("key%d", i+1), &store.Value{
-					Value:     fmt.Sprintf("value%d", i+1),
-					ValueType: store.String,
-					Expiry:    nil,
-				})
+				dataStore.Put(fmt.Sprintf("key%d", i), fmt.Sprintf("value%d", i), nil)
 			}
 
 			key := fmt.Sprintf("key%d", config.MaxKeys+1)
 			val := &store.Value{
 				Value:     fmt.Sprintf("value%d", config.MaxKeys+1),
 				ValueType: store.String,
-				Expiry:    nil,
 			}
-			dataStore.Put(key, val)
+			dataStore.Put(key, val.Value.(string), nil)
+
 			Expect(dataStore.Get(key)).To(Equal(val))
 		})
 	})
@@ -65,9 +60,8 @@ var _ = Describe("SimpleDataStore", func() {
 			value := &store.Value{
 				Value:     "value",
 				ValueType: store.String,
-				Expiry:    nil,
 			}
-			dataStore.Put("key", value)
+			dataStore.Put("key", value.Value.(string), nil)
 			Expect(dataStore.Get("key")).To(Equal(value))
 		})
 
@@ -76,13 +70,12 @@ var _ = Describe("SimpleDataStore", func() {
 		})
 
 		It("should delete and return nil for an expired key", func() {
-			expiryTime := utils.FromExpiryInMilliseconds(-1000)
+			pastTime := utils.FromExpiryInMilliseconds(-1000)
 			value := &store.Value{
 				Value:     "value",
 				ValueType: store.String,
-				Expiry:    expiryTime,
 			}
-			dataStore.Put("key", value)
+			dataStore.Put("key", value.Value.(string), pastTime)
 			Expect(dataStore.Get("key")).To(BeNil())
 		})
 	})
@@ -92,9 +85,9 @@ var _ = Describe("SimpleDataStore", func() {
 			value := &store.Value{
 				Value:     "value",
 				ValueType: store.String,
-				Expiry:    nil,
 			}
-			dataStore.Put("key", value)
+			dataStore.Put("key", value.Value.(string), nil)
+
 			Expect(dataStore.Delete("key")).To(BeTrue())
 			Expect(dataStore.Get("key")).To(BeNil())
 		})

@@ -4,6 +4,7 @@ import (
 	"github.com/shashwatrathod/redis-internals/commons"
 	"github.com/shashwatrathod/redis-internals/core/resp"
 	"github.com/shashwatrathod/redis-internals/core/store"
+	"github.com/shashwatrathod/redis-internals/utils"
 )
 
 // evaluates the TTL (Time to Live) command for a given key in the Redis store.
@@ -28,16 +29,20 @@ func evalTtl(args []string, s store.Store) *EvalResult {
 		}
 	}
 
+	expTs := s.GetExpiry(key)
+
 	// The Key exists but there is no expiry associated with it.
-	if val.Expiry == nil {
+	if expTs == nil {
 		return &EvalResult{
 			Response: resp.EncodeWithDatatype(-1, resp.RespInteger),
 			Error:    nil,
 		}
 	}
 
+	expiry := utils.FromExpiryInUnixTime(*expTs)
+
 	// The expiry has already passed.
-	if val.Expiry != nil && val.Expiry.IsExpired() {
+	if expiry != nil && expiry.IsExpired() {
 		return &EvalResult{
 			Response: resp.EncodeWithDatatype(-2, resp.RespInteger),
 			Error:    nil,
@@ -45,7 +50,7 @@ func evalTtl(args []string, s store.Store) *EvalResult {
 	}
 
 	return &EvalResult{
-		Response: resp.EncodeWithDatatype(val.Expiry.GetTimeRemainingInSeconds(), resp.RespInteger),
+		Response: resp.EncodeWithDatatype(expiry.GetTimeRemainingInSeconds(), resp.RespInteger),
 		Error:    nil,
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/shashwatrathod/redis-internals/commons"
 	"github.com/shashwatrathod/redis-internals/core/resp"
 	"github.com/shashwatrathod/redis-internals/core/store"
+	"github.com/shashwatrathod/redis-internals/utils"
 )
 
 // evalGet evaluates the GET command for the Redis server.
@@ -30,7 +31,7 @@ func evalGet(args []string, s store.Store) *EvalResult {
 	}
 
 	// If the Key exists but the Value is expired. This edge case should techincally never occur.
-	if val.Expiry != nil && val.Expiry.IsExpired() {
+	if exp := s.GetExpiry(key); exp != nil && utils.FromExpiryInUnixTime(*exp).IsExpired() {
 		return &EvalResult{
 			Response: []byte("$-1\r\n"),
 			Error:    nil,

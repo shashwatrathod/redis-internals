@@ -36,10 +36,13 @@ func (strategy *AllKeysLRUEvictionStrategy) findLeastRecentlyUsedKey(dstore Stor
 
 		keyMetadata := dstore.GetKeyMetadata(key)
 
-		if keyMetadata != nil && uint32(keyMetadata.LastAccessedTimestamp) < uint32(earliestAccessTime) {
-			earliestAccessTime = keyMetadata.LastAccessedTimestamp
-			leastRecentlyUsedKey = &key
+		if keyMetadata != nil {
 			nKeysScanned++
+
+			if uint32(keyMetadata.LastAccessedTimestamp) <= uint32(earliestAccessTime) {
+				earliestAccessTime = keyMetadata.LastAccessedTimestamp
+				leastRecentlyUsedKey = &key
+			}
 		}
 
 		return true
